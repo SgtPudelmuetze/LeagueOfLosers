@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
-<!-- Version: 1.30.00 - Anime Rating Dropdowns & Reset Fix -->
+<!-- Version: 1.32.00 - Added Changelogs Tab -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -167,6 +167,9 @@
             <button onclick="window.showPage('anime')" id="nav-anime" class="nav-link text-[10px] sm:text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest py-1 shrink-0 text-yellow-500/80 hover:text-yellow-400">Animes</button>
             <button onclick="window.showPage('tickets')" id="nav-tickets" class="nav-link text-[10px] sm:text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest py-1 flex items-center gap-2 shrink-0">
                 <span class="w-2 h-2 bg-red-500 rounded-full hidden shadow-[0_0_8px_rgba(239,68,68,0.6)]" id="ticketAlert"></span> Tickets
+            </button>
+            <button onclick="window.showPage('changelogs')" id="nav-changelogs" class="nav-link text-[10px] sm:text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest py-1 flex items-center gap-1.5 shrink-0 text-indigo-400 hover:text-indigo-300">
+                📋 Changelogs
             </button>
         </div>
     </nav>
@@ -485,6 +488,24 @@
                             <!-- JS injected rows -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHANGELOGS -->
+        <div id="page-changelogs" class="page hidden animate-in max-w-4xl mx-auto">
+            <div class="glass-card p-6 sm:p-10 space-y-8">
+                <div class="flex items-center gap-4 sm:gap-5">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 border border-indigo-500/20 shadow-lg shadow-indigo-500/5 shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-indigo-400">Patch Notes</h2>
+                        <p class="text-[9px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">Updates & Bugfixes</p>
+                    </div>
+                </div>
+                <div id="changelogList" class="space-y-6 pt-4">
+                    <!-- JS injected changelogs -->
                 </div>
             </div>
         </div>
@@ -1541,23 +1562,37 @@
             }
 
             list.innerHTML = filteredMatches.slice(0, 15).map(m => `
-                <div class="glass-card p-4 sm:p-6 space-y-3 sm:space-y-4 border-slate-700 relative group animate-in">
-                    <button onclick="window.deleteMatch(${m.id})" class="absolute right-4 sm:right-5 top-4 sm:top-5 opacity-0 group-hover:opacity-100 text-red-500 transition-opacity">🗑️</button>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="text-[11px] sm:text-[12px] font-black uppercase italic ${m.result === 'Win' ? 'text-green-400' : 'text-red-500'}">${m.result === 'Win' ? 'Victory' : 'Defeat'}</div>
-                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-black mt-1 uppercase">S${m.season} · ${m.type} · ${m.rank}</div>
+                <div class="glass-card p-4 sm:p-5 border-slate-700 relative group animate-in flex flex-col gap-3">
+                    <button onclick="window.deleteMatch(${m.id})" class="absolute right-4 top-4 p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all z-10">🗑️</button>
+                    
+                    <div class="flex justify-between items-center pr-8">
+                        <div class="flex items-center gap-3">
+                            <div class="text-[13px] sm:text-[14px] font-black uppercase italic ${m.result === 'Win' ? 'text-green-400' : 'text-red-500'}">${m.result === 'Win' ? 'Victory' : 'Defeat'}</div>
+                            <div class="h-4 w-[1px] bg-slate-700"></div>
+                            <div class="text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-widest">S${m.season} · ${m.type} ${m.rank !== '-' ? '· ' + m.rank : ''}</div>
                         </div>
-                        ${m.score ? `<div class="text-[10px] sm:text-[11px] font-black text-orange-500 bg-orange-500/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-orange-500/20">${m.score}</div>` : ''}
+                        ${m.score ? `<div class="text-[9px] sm:text-[10px] font-black text-orange-400 bg-orange-500/10 px-2 py-1 rounded-lg border border-orange-500/20 shadow-sm">${m.score} Pkt</div>` : ''}
                     </div>
-                    <div class="flex flex-wrap gap-1.5 sm:gap-2">${(m.players || []).map(p => {
-                        let heroStr = '';
-                        if(p.heroes && p.heroes.length > 0) heroStr = p.heroes.join(', ');
-                        else if(p.hero && p.hero !== 'Held wählen') heroStr = p.hero;
-                        
-                        return `<div class="bg-white/[0.04] border border-slate-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-black text-slate-200 uppercase flex items-center gap-1 sm:gap-1.5"><span>${roles[p.role].icon}</span> ${p.name} <span class="text-slate-600 italic font-medium ml-1">${heroStr}</span></div>`;
-                    }).join('')}</div>
-                    <div class="text-[9px] sm:text-[10px] text-slate-600 font-black border-t border-slate-700 pt-2 sm:pt-3 flex justify-between uppercase"><span>${m.date}</span><span>${m.map || '-'}</span></div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        ${(m.players || []).map(p => {
+                            let heroStr = '';
+                            if(p.heroes && p.heroes.length > 0) heroStr = p.heroes.join(', ');
+                            else if(p.hero && p.hero !== 'Held wählen') heroStr = p.hero;
+                            
+                            return `
+                            <div class="flex items-center gap-1.5 bg-[#0f172a] border border-slate-700 px-2.5 py-1.5 rounded-lg">
+                                <span class="text-[10px] ${roles[p.role].color}">${roles[p.role].icon}</span>
+                                <span class="text-[9px] sm:text-[10px] font-black text-slate-200 uppercase tracking-wide">${p.name}</span>
+                                ${heroStr ? `<span class="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-widest bg-white/5 px-1.5 py-0.5 rounded ml-1">${heroStr}</span>` : ''}
+                            </div>`;
+                        }).join('')}
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-widest pt-2 border-t border-slate-700/50">
+                        <span class="flex items-center gap-1.5">📅 ${m.date} <span class="opacity-50">${m.time || ''}</span></span>
+                        <span class="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md text-slate-400">🗺️ ${m.map && m.map !== 'Wähle Karte' ? m.map : 'Unbekannt'}</span>
+                    </div>
                 </div>`).join('');
         }
 
@@ -1568,6 +1603,44 @@
             setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), `season_${matchToDelete.season}`), { matches: seasonMatches }).then(() => { showBanner("Gelöscht!", "success"); deleteDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), id.toString())).catch(()=>{}); }); 
         }
         
+        // --- CHANGELOG LOGIC ---
+        const changelogs = [
+            // KI: Ab hier neue Versionen eintragen
+            { version: "1.32.00", date: "30.03.2026", changes: ["Neuer 'Changelogs' Tab hinzugefügt", "Automatische Pflege der Patch-Notes durch KI implementiert"] },
+            { version: "1.31.00", date: "30.03.2026", changes: ["Verbessertes Match History UI", "Bessere Skalierung und Konturen bei Team-Setups", "Zentrierung der Sieges/Niederlage Anzeige"] },
+            { version: "1.30.00", date: "30.03.2026", changes: ["Anime Punktevergabe auf Dropdowns umgestellt", "Auto-Reset der Anime-Formularelemente gefixt"] },
+            { version: "1.29.00", date: "30.03.2026", changes: ["Top 10 statt Top 3 Listen im Dashboard", "Spieler-Namen bei Top Helden hinzugefügt", "Feste Höhen & Scrollbars für lange Listen"] },
+            { version: "1.28.00", date: "30.03.2026", changes: ["Anime Kategorien voll ausgeschrieben", "Info-Tooltips (i) für alle Bewertungskategorien", "Alphabetische Sortierung der Genres"] },
+            { version: "1.27.00", date: "30.03.2026", changes: ["Bugfix: Standard-Season auf 21 zurückgesetzt"] },
+            { version: "1.26.00", date: "30.03.2026", changes: ["Top Maps Statistik hinzugefügt", "Mehrfachauswahl für Helden in Ranglisten-Matches (Counter-Picks)"] },
+            { version: "1.25.00", date: "30.03.2026", changes: ["Top 3 Helden im Dashboard hinzugefügt"] },
+            { version: "1.24.00", date: "30.03.2026", changes: ["Exaktes Hero Name Matching (Stadion DPS Fix)"] },
+            { version: "1.23.00", date: "30.03.2026", changes: ["Verlauf in 'Eintragen' wird nun nach Season und Modus gefiltert", "Anime Legende als leuchtender, auffälliger Button"] },
+            { version: "1.22.00", date: "30.03.2026", changes: ["Doppelte Scrollbars entfernt (hide-scroll)", "Kompakteres Anime-Formular"] },
+            { version: "1.21.00", date: "30.03.2026", changes: ["Spieler ohne Matches werden komplett minimiert dargestellt", "Dynamische Skalierung für Raster verbessert"] }
+        ];
+
+        window.renderChangelogs = function() {
+            const container = document.getElementById('changelogList');
+            if(!container) return;
+            container.innerHTML = changelogs.map(log => `
+                <div class="glass-card p-5 sm:p-6 border-slate-700 border-l-4 border-l-indigo-500 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <div class="flex flex-wrap justify-between items-start gap-4 mb-4 border-b border-slate-700/50 pb-3">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-black text-indigo-400 uppercase tracking-widest">Version ${log.version}</h3>
+                            <p class="text-[9px] sm:text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-widest">${log.date}</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2.5 relative z-10">
+                        ${log.changes.map(change => `<li class="text-[10px] sm:text-xs text-slate-300 font-medium flex items-start gap-2"><span class="text-indigo-500 mt-0.5">✦</span> <span class="leading-relaxed">${change}</span></li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        };
+
         function showBanner(text, type) { const banner = document.createElement('div'); banner.className = `fixed bottom-12 left-1/2 -translate-x-1/2 px-10 py-5 rounded-[2.5rem] text-[11px] font-black z-[100] ${type === 'error' ? 'bg-red-600' : 'bg-green-600'} text-white border border-white/20 animate-in tracking-widest uppercase italic shadow-2xl`; banner.innerText = text; document.body.appendChild(banner); setTimeout(() => banner.remove(), 3500); }
         onAuthStateChanged(auth, (u) => { currentUser = u; if (u) setupCloudListeners(); });
         signInAnonymously(auth).catch(e => setCloudStatus('Auth Error', 'error'));
@@ -1575,6 +1648,7 @@
         // Init logic
         initAnimeReviewer();
         initAnimeTabs();
+        window.renderChangelogs(); // Init changelogs
         window.showPage('dashboard'); 
         window.updateRankOptions(true); 
         window.updateMapOptions(true); 
@@ -1582,7 +1656,7 @@
     </script>
 
     <div class="fixed bottom-4 right-4 sm:right-6 text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest z-50 bg-[#0f172a]/80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg backdrop-blur-sm border border-white/5 pointer-events-none">
-        v.1.30.00
+        v.1.32.00
     </div>
 </body>
 </html>
