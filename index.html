@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
-<!-- Version: 1.2 - Diagramm & Ticket Management Update -->
+<!-- Version: 1.3 - UI Polish: Lighter Darkmode & Sharper Contours -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,9 +12,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         
         :root {
-            --bg-dark: #0b0e17;
-            --card-bg: #111522;
-            --card-border: #1e253c;
+            --bg-dark: #0f172a; /* Etwas helleres Slate-Blau */
+            --card-bg: #1e293b; /* Hellere Karten */
+            --card-border: #334155; /* Deutlichere Konturen */
             --accent-blue: #3b82f6;
             --accent-orange: #f97316;
             --text-yellow: #eab308;
@@ -23,37 +23,39 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-dark);
-            color: #e2e8f0;
+            color: #f1f5f9;
             overflow-x: hidden;
         }
 
         .glass-card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 1.75rem;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.4), 0 5px 15px -5px rgba(0,0,0,0.3);
         }
 
         .btn-toggle {
-            background-color: var(--card-bg);
+            background-color: #1e293b;
             border: 1px solid var(--card-border);
-            border-radius: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0.75rem;
+            transition: all 0.2s ease-in-out;
         }
 
         .btn-toggle.active {
             border-color: var(--accent-blue);
-            background-color: rgba(59, 130, 246, 0.1);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            background-color: rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
         }
 
         .season-tab {
             position: relative;
             transition: color 0.3s;
+            color: #94a3b8;
         }
 
         .season-tab.active {
             color: var(--accent-orange);
+            font-weight: 800;
         }
 
         .season-tab.active::after {
@@ -62,14 +64,14 @@
             bottom: -2px;
             left: 0;
             width: 100%;
-            height: 2px;
+            height: 3px;
             background: var(--accent-orange);
-            border-radius: 2px;
+            border-radius: 3px;
         }
 
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
@@ -88,7 +90,7 @@
         .player-details {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             opacity: 0;
         }
         .player-details.open {
@@ -96,257 +98,273 @@
             opacity: 1;
         }
 
-        /* Status Farben für Tickets */
-        .ticket-open { border-left-color: #3b82f6 !important; }
-        .ticket-closed { border-left-color: #10b981 !important; opacity: 0.8; }
-        .ticket-bug { border-left-color: #ef4444 !important; }
+        /* Ticket Status */
+        .ticket-open { border-left: 4px solid #3b82f6 !important; }
+        .ticket-closed { border-left: 4px solid #10b981 !important; opacity: 0.75; }
+        .ticket-bug { border-left: 4px solid #ef4444 !important; }
+        
+        .nav-link {
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            color: white;
+            border-bottom-color: var(--accent-blue);
+        }
     </style>
 </head>
 <body class="min-h-screen pb-10">
 
-    <nav class="border-b border-white/5 py-4 px-8 sticky top-0 bg-[#0b0e17]/90 backdrop-blur-xl z-40 flex items-center justify-between">
+    <nav class="border-b border-white/10 py-4 px-8 sticky top-0 bg-[#0f172a]/95 backdrop-blur-2xl z-40 flex items-center justify-between">
         <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="window.showPage('dashboard')">
-                <div class="w-9 h-9 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="window.showPage('dashboard')">
+                <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30 group-hover:scale-105 transition-transform">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
                 </div>
-                <h1 class="text-lg font-black tracking-tight uppercase italic">Team Stats</h1>
+                <h1 class="text-xl font-black tracking-tight uppercase italic group-hover:text-orange-500 transition-colors">Team Stats</h1>
             </div>
             
-            <div class="hidden md:flex items-center gap-2 bg-slate-500/10 border border-slate-500/20 px-3 py-1 rounded-full" id="cloudStatusContainer">
-                <span class="w-1.5 h-1.5 bg-slate-500 rounded-full" id="cloudStatusDot"></span>
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest" id="cloudStatus">Initialisiere...</span>
+            <div class="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full" id="cloudStatusContainer">
+                <span class="w-2 h-2 bg-slate-500 rounded-full" id="cloudStatusDot"></span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="cloudStatus">Initialisiere...</span>
             </div>
         </div>
 
-        <div class="flex gap-4 md:gap-8">
-            <button onclick="window.showPage('dashboard')" id="nav-dashboard" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Dashboard</button>
-            <button onclick="window.showPage('players')" id="nav-players" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Spieler</button>
-            <button onclick="window.showPage('entry')" id="nav-entry" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Eintragen</button>
-            <button onclick="window.showPage('tickets')" id="nav-tickets" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 bg-red-500 rounded-full hidden" id="ticketAlert"></span> Tickets
+        <div class="flex gap-4 md:gap-10">
+            <button onclick="window.showPage('dashboard')" id="nav-dashboard" class="nav-link text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest py-1">Dashboard</button>
+            <button onclick="window.showPage('players')" id="nav-players" class="nav-link text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest py-1">Spieler</button>
+            <button onclick="window.showPage('entry')" id="nav-entry" class="nav-link text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest py-1">Eintragen</button>
+            <button onclick="window.showPage('tickets')" id="nav-tickets" class="nav-link text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest py-1 flex items-center gap-2">
+                <span class="w-2 h-2 bg-red-500 rounded-full hidden shadow-[0_0_8px_rgba(239,68,68,0.6)]" id="ticketAlert"></span> Tickets
             </button>
         </div>
     </nav>
 
-    <div class="max-w-[1500px] mx-auto px-8 pt-5 flex flex-wrap justify-between items-end border-b border-white/5 gap-4">
-        <div class="flex gap-8">
-            <button onclick="window.setSeason(21)" id="season-21" class="season-tab pb-3 text-xs font-black uppercase tracking-[0.2em] active">Season 21</button>
-            <button onclick="window.setSeason(22)" id="season-22" class="season-tab pb-3 text-xs font-black uppercase tracking-[0.2em]">Season 22</button>
+    <div class="max-w-[1500px] mx-auto px-8 pt-6 flex flex-wrap justify-between items-end border-b border-white/10 gap-4">
+        <div class="flex gap-10">
+            <button onclick="window.setSeason(21)" id="season-21" class="season-tab pb-4 text-xs font-black uppercase tracking-[0.2em] active">Season 21</button>
+            <button onclick="window.setSeason(22)" id="season-22" class="season-tab pb-4 text-xs font-black uppercase tracking-[0.2em]">Season 22</button>
         </div>
-        <div class="flex gap-2 pb-3">
-            <button onclick="window.setViewMode('Alle')" id="viewModeAlle" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all bg-orange-500/10 text-orange-500 border-orange-500/20">Alle Modi</button>
-            <button onclick="window.setViewMode('Rangliste')" id="viewModeRanked" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all hover:bg-white/5 text-slate-500">Rangliste</button>
-            <button onclick="window.setViewMode('Stadion')" id="viewModeStadium" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all hover:bg-white/5 text-slate-500">Stadion</button>
+        <div class="flex gap-3 pb-4">
+            <button onclick="window.setViewMode('Alle')" id="viewModeAlle" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all bg-orange-500/10 text-orange-500 border-orange-500/30">Alle Modi</button>
+            <button onclick="window.setViewMode('Rangliste')" id="viewModeRanked" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 transition-all hover:bg-white/5 text-slate-400">Rangliste</button>
+            <button onclick="window.setViewMode('Stadion')" id="viewModeStadium" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 transition-all hover:bg-white/5 text-slate-400">Stadion</button>
         </div>
     </div>
 
     <main class="max-w-[1500px] mx-auto p-8">
 
         <!-- DASHBOARD -->
-        <div id="page-dashboard" class="page space-y-8 animate-in hidden">
+        <div id="page-dashboard" class="page space-y-10 animate-in hidden">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-black italic uppercase tracking-tighter">Übersicht <span class="active-season-label text-orange-500">S21</span> <span id="active-mode-label" class="text-slate-500 text-lg ml-2">Alle Modi</span></h2>
-                    <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Globale Performance</p>
+                    <h2 class="text-3xl font-black italic uppercase tracking-tighter">Übersicht <span class="active-season-label text-orange-500">S21</span> <span id="active-mode-label" class="text-slate-400 text-xl ml-3 font-medium">Alle Modi</span></h2>
+                    <p class="text-slate-500 text-[11px] font-bold uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                        <span class="w-3 h-[1px] bg-slate-700"></span> Globale Performance
+                    </p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="document.getElementById('importFile').click()" class="text-[10px] bg-white/5 hover:bg-blue-500/20 px-3 py-2 rounded-lg border border-white/5 uppercase font-bold tracking-widest transition-all">📂 Import</button>
+                <div class="flex gap-3">
+                    <button onclick="document.getElementById('importFile').click()" class="text-[10px] bg-white/5 hover:bg-blue-500/20 px-4 py-2.5 rounded-xl border border-white/10 uppercase font-black tracking-widest transition-all">📂 Daten Importieren</button>
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="window.importData(event)">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Stat Cards -->
-                <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div class="glass-card p-6 text-center border-t-4 border-orange-500">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Winrate</p>
-                        <p id="globalWinrate" class="text-3xl font-black text-orange-400">0%</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Winrate</p>
+                        <p id="globalWinrate" class="text-4xl font-black text-orange-400 drop-shadow-sm">0%</p>
                     </div>
-                    <div class="glass-card p-6 text-center border-t-4 border-white/5">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Matches</p>
-                        <p id="globalMatches" class="text-3xl font-black">0</p>
+                    <div class="glass-card p-6 text-center border-t-4 border-slate-600">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Matches</p>
+                        <p id="globalMatches" class="text-4xl font-black text-white">0</p>
                     </div>
                     <div class="glass-card p-6 text-center border-t-4 border-green-500">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Wins</p>
-                        <p id="globalWins" class="text-3xl font-black text-green-400">0</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Wins</p>
+                        <p id="globalWins" class="text-4xl font-black text-green-400">0</p>
                     </div>
                     <div class="glass-card p-6 text-center border-t-4 border-red-500">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Losses</p>
-                        <p id="globalLosses" class="text-3xl font-black text-red-500">0</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Losses</p>
+                        <p id="globalLosses" class="text-4xl font-black text-red-500">0</p>
                     </div>
                     
-                    <div class="glass-card p-5 col-span-2 flex items-center justify-between border-l-4 border-green-500">
-                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Längste Siegesserie</span>
-                        <span id="maxWinStreak" class="text-2xl font-black text-green-400">0</span>
+                    <div class="glass-card p-6 col-span-2 flex items-center justify-between border-l-4 border-green-500/50">
+                        <span class="text-xs font-black uppercase tracking-[0.1em] text-slate-400">Längste Siegesserie</span>
+                        <span id="maxWinStreak" class="text-3xl font-black text-green-400">0</span>
                     </div>
-                    <div class="glass-card p-5 col-span-2 flex items-center justify-between border-l-4 border-red-500">
-                        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Längste Niederlagenserie</span>
-                        <span id="maxLossStreak" class="text-2xl font-black text-red-400">0</span>
+                    <div class="glass-card p-6 col-span-2 flex items-center justify-between border-l-4 border-red-500/50">
+                        <span class="text-xs font-black uppercase tracking-[0.1em] text-slate-400">Längste Niederlagenserie</span>
+                        <span id="maxLossStreak" class="text-3xl font-black text-red-400">0</span>
                     </div>
 
-                    <div class="glass-card p-6 col-span-2 text-center border-t-4 border-red-500/50">
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Leaver Quote</p>
-                        <p class="text-2xl font-black text-red-400"><span id="globalLeavers">0</span> <span class="text-[10px] text-slate-500 font-normal ml-1">(<span id="globalLeaverPerc">0%</span>)</span></p>
+                    <div class="glass-card p-6 col-span-2 text-center bg-white/[0.02]">
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Leaver Quote</p>
+                        <p class="text-2xl font-black text-red-400"><span id="globalLeavers">0</span> <span class="text-[11px] text-slate-500 font-normal ml-1 uppercase tracking-tighter">(<span id="globalLeaverPerc">0%</span>)</span></p>
                     </div>
-                    <div class="glass-card p-6 col-span-2 text-center border-t-4 border-slate-500">
-                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Zuletzt Gespielt</p>
-                         <p id="lastPlayedDate" class="text-xl font-bold text-white">-</p>
+                    <div class="glass-card p-6 col-span-2 text-center bg-white/[0.02]">
+                         <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Zuletzt Gespielt</p>
+                         <p id="lastPlayedDate" class="text-xl font-bold text-white uppercase italic tracking-tight">-</p>
                     </div>
                 </div>
 
                 <!-- Kuchendiagramm -->
-                <div class="glass-card p-8 flex flex-col items-center justify-center min-h-[350px]">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 italic">Win / Loss Verteilung</h3>
-                    <div class="w-full h-full max-w-[250px] relative">
+                <div class="glass-card p-8 flex flex-col items-center justify-center min-h-[400px] border-white/5">
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 mb-8 flex items-center gap-2">
+                         <span class="w-1.5 h-1.5 bg-orange-500 rounded-full"></span> Win / Loss Split
+                    </h3>
+                    <div class="w-full h-full max-w-[260px] relative">
                         <canvas id="winLossChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                 <div>
-                    <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-3 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Beste Kombis
+                    <h3 class="text-[11px] font-black uppercase text-slate-500 tracking-[0.3em] mb-4 flex items-center gap-3">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span> Elite Kombis
                     </h3>
-                    <div id="bestCombos" class="space-y-3"></div>
+                    <div id="bestCombos" class="space-y-4"></div>
                 </div>
                 <div>
-                    <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-3 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span> Schwächste Kombis
+                    <h3 class="text-[11px] font-black uppercase text-slate-500 tracking-[0.3em] mb-4 flex items-center gap-3">
+                        <span class="w-2 h-2 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.4)]"></span> Kritische Kombis
                     </h3>
-                    <div id="worstCombos" class="space-y-3"></div>
+                    <div id="worstCombos" class="space-y-4"></div>
                 </div>
             </div>
         </div>
 
         <!-- PLAYERS -->
         <div id="page-players" class="page hidden animate-in">
-             <div id="playersGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
+             <div id="playersGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-8"></div>
         </div>
 
         <!-- TICKETS -->
-        <div id="page-tickets" class="page hidden grid grid-cols-1 md:grid-cols-3 gap-6 animate-in">
-            <div class="md:col-span-2 glass-card p-8 space-y-6 h-fit">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center text-red-500">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+        <div id="page-tickets" class="page hidden grid grid-cols-1 md:grid-cols-3 gap-8 animate-in">
+            <div class="md:col-span-2 glass-card p-10 space-y-8 h-fit">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 border border-red-500/20 shadow-lg shadow-red-500/5">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     </div>
                     <div>
-                        <h2 class="text-xl font-black italic uppercase tracking-tighter">Support & Feedback</h2>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Problem melden oder Features vorschlagen</p>
+                        <h2 class="text-2xl font-black italic uppercase tracking-tighter">Support Terminal</h2>
+                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">Feedback & Fehlerberichte</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Kategorie</label>
-                        <select id="ticketType" class="custom-select w-full bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold">
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2.5">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kategorie</label>
+                        <select id="ticketType" class="custom-select w-full bg-[#1e293b] border border-white/10 p-4 rounded-xl outline-none text-sm font-bold text-white focus:border-red-500 transition-colors">
                             <option value="Problem">⚠️ Problem / Bug</option>
                             <option value="Feature">✨ Feature Vorschlag</option>
                             <option value="Content">🗺️ Fehlende Maps/Helden</option>
                             <option value="Sonstiges">❓ Sonstiges</option>
                         </select>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Dein Name / BattleTag</label>
-                        <input type="text" id="ticketAuthor" placeholder="Pudelmuetze#1234" class="w-full bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold">
+                    <div class="space-y-2.5">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Absender</label>
+                        <input type="text" id="ticketAuthor" placeholder="Dein BattleTag" class="w-full bg-[#1e293b] border border-white/10 p-4 rounded-xl outline-none text-sm font-bold text-white focus:border-red-500 transition-colors">
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Beschreibung</label>
-                    <textarea id="ticketMessage" rows="5" placeholder="Was funktioniert nicht? Was fehlt dir?" class="w-full bg-[#0b0e17] border border-white/5 p-4 rounded-xl outline-none text-xs font-medium resize-none"></textarea>
+                <div class="space-y-2.5">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nachricht</label>
+                    <textarea id="ticketMessage" rows="5" placeholder="Beschreibe dein Anliegen so genau wie möglich..." class="w-full bg-[#1e293b] border border-white/10 p-5 rounded-xl outline-none text-sm font-medium text-slate-200 focus:border-red-500 transition-colors resize-none"></textarea>
                 </div>
 
-                <button onclick="window.saveTicket()" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-xl font-black uppercase tracking-[0.2em] shadow-lg shadow-red-600/20 transition-all">
-                    Ticket absenden
+                <button onclick="window.saveTicket()" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-xl font-black uppercase tracking-[0.2em] shadow-lg shadow-red-600/20 transition-all hover:scale-[1.01] active:scale-95">
+                    Ticket Übermitteln
                 </button>
             </div>
 
-            <div class="glass-card p-6 space-y-5 flex flex-col">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xs font-black uppercase tracking-widest italic text-slate-400">Aktuelle Tickets</h2>
-                    <span class="text-[8px] font-bold text-slate-600 uppercase">Live Update</span>
+            <div class="glass-card p-6 space-y-6 flex flex-col border-white/5">
+                <div class="flex justify-between items-center border-b border-white/5 pb-4">
+                    <h2 class="text-xs font-black uppercase tracking-[0.2em] italic text-slate-400">Status Monitor</h2>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                        <span class="text-[9px] font-black text-slate-500 uppercase">Live</span>
+                    </span>
                 </div>
-                <div id="ticketsList" class="space-y-3 overflow-y-auto max-h-[600px] custom-scrollbar pr-2"></div>
+                <div id="ticketsList" class="space-y-4 overflow-y-auto max-h-[600px] custom-scrollbar pr-2"></div>
             </div>
         </div>
 
         <!-- ENTRY -->
-        <div id="page-entry" class="page hidden grid grid-cols-1 md:grid-cols-3 gap-6 animate-in">
-            <div class="md:col-span-2 glass-card p-8 space-y-6">
-                <h2 class="text-xl font-black italic uppercase tracking-tighter">Match Logbuch</h2>
+        <div id="page-entry" class="page hidden grid grid-cols-1 md:grid-cols-3 gap-8 animate-in">
+            <div class="md:col-span-2 glass-card p-10 space-y-8">
+                <h2 class="text-2xl font-black italic uppercase tracking-tighter">Match Logbuch</h2>
                 
-                <div class="grid grid-cols-2 gap-5">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Aktive Season</label>
-                        <select id="matchSeason" class="custom-select w-full bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs text-orange-500 font-black italic">
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2.5">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Season</label>
+                        <select id="matchSeason" class="custom-select w-full bg-[#1e293b] border border-white/10 p-4 rounded-xl outline-none text-sm text-orange-500 font-black italic">
                             <option value="21" selected>Season 21</option>
                             <option value="22">Season 22</option>
                         </select>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Spielmodus</label>
-                        <div class="flex gap-2">
-                            <button onclick="window.setMatchType('Rangliste')" id="typeRanked" class="flex-1 py-3.5 btn-toggle active text-[10px] font-black uppercase tracking-widest">Rangliste</button>
-                            <button onclick="window.setMatchType('Stadion')" id="typeStadium" class="flex-1 py-3.5 btn-toggle text-[10px] font-black uppercase tracking-widest">Stadion</button>
+                    <div class="space-y-2.5">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Modus</label>
+                        <div class="flex gap-3">
+                            <button onclick="window.setMatchType('Rangliste')" id="typeRanked" class="flex-1 py-4 btn-toggle active text-[11px] font-black uppercase tracking-widest">Rangliste</button>
+                            <button onclick="window.setMatchType('Stadion')" id="typeStadium" class="flex-1 py-4 btn-toggle text-[11px] font-black uppercase tracking-widest">Stadion</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-5">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Match Ergebnis</label>
-                        <div class="flex gap-2">
-                            <button onclick="window.setResult('Win')" id="resWin" class="flex-1 py-3.5 btn-toggle active border-green-500/30 text-green-500 text-[10px] font-black uppercase tracking-widest">Win</button>
-                            <button onclick="window.setResult('Lose')" id="resLoss" class="flex-1 py-3.5 btn-toggle border-red-500/30 text-red-500 text-[10px] font-black uppercase tracking-widest">Lose</button>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2.5">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Ergebnis</label>
+                        <div class="flex gap-3">
+                            <button onclick="window.setResult('Win')" id="resWin" class="flex-1 py-4 btn-toggle active border-green-500/40 text-green-400 text-[11px] font-black uppercase tracking-widest">Win</button>
+                            <button onclick="window.setResult('Lose')" id="resLoss" class="flex-1 py-4 btn-toggle border-red-500/40 text-red-400 text-[11px] font-black uppercase tracking-widest">Lose</button>
                         </div>
                     </div>
-                    <div class="space-y-2 min-w-0">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Durchschnittsrang</label>
-                        <div class="flex items-center gap-2 w-full">
-                            <select id="matchRankStart" class="custom-select min-w-0 flex-1 bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold text-ellipsis whitespace-nowrap"></select>
-                            <span class="text-slate-500 font-bold shrink-0 text-xs">bis</span>
-                            <select id="matchRankEnd" class="custom-select min-w-0 flex-1 bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold text-ellipsis whitespace-nowrap"></select>
+                    <div class="space-y-2.5 min-w-0">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Avg. Lobby Rang</label>
+                        <div class="flex items-center gap-3 w-full bg-[#1e293b] border border-white/10 p-2 rounded-xl">
+                            <select id="matchRankStart" class="custom-select min-w-0 flex-1 bg-transparent border-0 p-2 outline-none text-xs font-bold text-ellipsis"></select>
+                            <span class="text-slate-600 font-black text-[10px] uppercase">bis</span>
+                            <select id="matchRankEnd" class="custom-select min-w-0 flex-1 bg-transparent border-0 p-2 outline-none text-xs font-bold text-ellipsis"></select>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-5">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Karte / Arena</label>
-                        <select id="matchMap" class="custom-select w-full bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold"></select>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2.5">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Karte / Arena</label>
+                        <select id="matchMap" class="custom-select w-full bg-[#1e293b] border border-white/10 p-4 rounded-xl outline-none text-sm font-bold text-white"></select>
                     </div>
-                    <div class="space-y-2 hidden" id="punkteContainer">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Punkte</label>
-                        <input type="text" id="matchScore" placeholder="z.B. 12500" class="w-full bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold placeholder:text-slate-700">
+                    <div class="space-y-2.5 hidden" id="punkteContainer">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Punkte Score</label>
+                        <input type="text" id="matchScore" placeholder="z.B. 12.500" class="w-full bg-[#1e293b] border border-white/10 p-4 rounded-xl outline-none text-sm font-bold placeholder:text-slate-600 text-white">
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 p-3 bg-red-500/5 rounded-xl border border-red-500/10 w-max">
-                    <input type="checkbox" id="matchLeaver" class="w-4 h-4 rounded border-white/10 bg-[#0b0e17] accent-red-500 cursor-pointer">
-                    <label for="matchLeaver" class="text-[10px] font-black text-red-400 uppercase tracking-widest cursor-pointer">Leaver im Match?</label>
+                <div class="flex items-center gap-4 p-4 bg-red-500/5 rounded-2xl border border-red-500/20 w-max">
+                    <input type="checkbox" id="matchLeaver" class="w-5 h-5 rounded-md border-white/20 bg-[#0f172a] accent-red-500 cursor-pointer">
+                    <label for="matchLeaver" class="text-[11px] font-black text-red-400 uppercase tracking-widest cursor-pointer">Leaver Vorfall?</label>
                 </div>
 
-                <div class="pt-5 border-t border-white/5 space-y-3">
+                <div class="pt-8 border-t border-white/10 space-y-5">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Team Setup (Max. 5)</h3>
-                        <button onclick="window.addPlayerToMatch()" id="btnAddPlayer" class="text-[10px] font-black text-blue-400 hover:text-blue-300 transition-colors uppercase bg-blue-500/10 px-3 py-1.5 rounded-lg">+ Spieler</button>
+                        <h3 class="text-xs font-black uppercase text-slate-400 tracking-[0.2em]">Team Roster <span class="text-slate-600 font-medium ml-2">(Max. 5)</span></h3>
+                        <button onclick="window.addPlayerToMatch()" id="btnAddPlayer" class="text-[10px] font-black text-blue-400 hover:text-white transition-all uppercase bg-blue-500/10 hover:bg-blue-600 px-4 py-2 rounded-xl border border-blue-500/20">+ Spieler Hinzufügen</button>
                     </div>
-                    <div id="matchPlayersList" class="space-y-3"></div>
+                    <div id="matchPlayersList" class="space-y-4"></div>
                 </div>
 
-                <button onclick="window.saveMatch()" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-600/20 transition-all hover:scale-[1.01] active:scale-95">
-                    Match speichern
+                <button onclick="window.saveMatch()" class="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20 transition-all hover:scale-[1.01] active:scale-95">
+                    Match Finalisieren
                 </button>
             </div>
 
-            <div class="glass-card p-6 space-y-5 flex flex-col">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xs font-black uppercase tracking-widest italic text-slate-400">Letzte Matches</h2>
+            <div class="glass-card p-6 space-y-6 flex flex-col border-white/5">
+                <div class="flex items-center justify-between border-b border-white/5 pb-4">
+                    <h2 class="text-xs font-black uppercase tracking-[0.2em] italic text-slate-400">Historie</h2>
                 </div>
-                <div id="recentMatchesList" class="space-y-3 overflow-y-auto max-h-[700px] pr-2 custom-scrollbar"></div>
+                <div id="recentMatchesList" class="space-y-4 overflow-y-auto max-h-[800px] pr-2 custom-scrollbar"></div>
             </div>
         </div>
 
@@ -450,7 +468,7 @@
                     const selectedOpt = select.options[select.selectedIndex];
                     trigger.innerHTML = `<span class="truncate ${isRight ? 'w-full text-right' : ''} pr-2">${selectedOpt ? selectedOpt.text : ''}</span><span class="text-slate-500 text-[10px] shrink-0">▼</span>`;
                     const dropdown = document.createElement('div');
-                    dropdown.className = 'absolute left-0 top-[calc(100%+8px)] w-full min-w-[12rem] bg-[#161a2b] border border-white/10 rounded-xl shadow-2xl opacity-0 invisible transition-all z-[100] max-h-64 overflow-y-auto custom-scrollbar';
+                    dropdown.className = 'absolute left-0 top-[calc(100%+8px)] w-full min-w-[12rem] bg-[#1e293b] border border-white/10 rounded-2xl shadow-2xl opacity-0 invisible transition-all z-[100] max-h-64 overflow-y-auto custom-scrollbar';
                     if (isRight) { dropdown.classList.replace('left-0', 'right-0'); }
                     container.addEventListener('blur', () => {
                         dropdown.classList.remove('opacity-100', 'visible');
@@ -470,7 +488,7 @@
                     });
                     const createItem = (opt, index) => {
                         const item = document.createElement('div');
-                        item.className = 'px-4 py-3 text-xs text-slate-300 hover:bg-white/10 cursor-pointer transition-colors break-words whitespace-normal';
+                        item.className = 'px-5 py-3.5 text-xs text-slate-300 hover:bg-white/10 cursor-pointer transition-colors break-words whitespace-normal border-b border-white/5 last:border-0';
                         if (opt.selected) item.classList.add('text-orange-400', 'bg-white/5', 'font-bold');
                         item.innerHTML = opt.text;
                         item.addEventListener('mousedown', (e) => e.preventDefault());
@@ -487,7 +505,7 @@
                     Array.from(select.children).forEach(child => {
                         if (child.tagName === 'OPTGROUP') {
                             const groupLabel = document.createElement('div');
-                            groupLabel.className = 'px-4 py-2 text-[9px] font-black text-slate-500 uppercase tracking-widest bg-[#0b0e17] sticky top-0 z-10 border-y border-white/5 first:border-t-0';
+                            groupLabel.className = 'px-5 py-2.5 text-[9px] font-black text-slate-500 uppercase tracking-widest bg-[#0f172a] sticky top-0 z-10 border-y border-white/5 first:border-t-0';
                             groupLabel.innerText = child.label;
                             dropdown.appendChild(groupLabel);
                             const options = child.querySelectorAll('option');
@@ -515,8 +533,8 @@
             const dotEl = document.getElementById('cloudStatusDot');
             if(!statusEl) return;
             statusEl.innerText = status;
-            statusContainer.className = 'hidden md:flex items-center gap-2 px-3 py-1 rounded-full border';
-            dotEl.className = 'w-1.5 h-1.5 rounded-full';
+            statusContainer.className = 'hidden md:flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5';
+            dotEl.className = 'w-2 h-2 rounded-full shadow-sm';
             if(type === 'success') {
                 statusContainer.classList.add('bg-green-500/10', 'border-green-500/20');
                 dotEl.classList.add('bg-green-500', 'animate-pulse');
@@ -589,9 +607,9 @@
                 const btn = document.getElementById('viewMode' + btnIdx);
                 if(!btn) return;
                 if (m === mode) {
-                    btn.className = 'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all bg-orange-500/10 text-orange-500 border-orange-500/20';
+                    btn.className = 'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all bg-orange-500/10 text-orange-500 border-orange-500/30';
                 } else {
-                    btn.className = 'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all hover:bg-white/5 text-slate-500';
+                    btn.className = 'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/10 transition-all hover:bg-white/5 text-slate-400';
                 }
             });
             const label = document.getElementById('active-mode-label');
@@ -604,14 +622,14 @@
             const targetPage = document.getElementById(`page-${id}`);
             if(targetPage) targetPage.classList.remove('hidden');
             
-            document.querySelectorAll('nav button').forEach(b => {
+            document.querySelectorAll('.nav-link').forEach(b => {
+                b.classList.remove('active');
                 b.classList.replace('text-white', 'text-slate-400');
-                b.classList.remove('text-white'); // Sicherheitshalber
             });
             const activeBtn = document.getElementById(`nav-${id}`);
             if(activeBtn) {
+                activeBtn.classList.add('active');
                 activeBtn.classList.replace('text-slate-400', 'text-white');
-                activeBtn.classList.add('text-white');
             }
             
             if(id === 'tickets') {
@@ -651,7 +669,7 @@
         window.updateMapOptions = function(skipInit = false) {
             const mapSelect = document.getElementById('matchMap');
             if(!mapSelect) return;
-            mapSelect.innerHTML = '<option value="">Keine Karte</option>';
+            mapSelect.innerHTML = '<option value="">Wähle Karte</option>';
             const categories = mapsByType[currentMatchType === 'Rangliste' ? 'ranked' : 'stadium'];
             for (const [cat, maps] of Object.entries(categories)) {
                 const group = document.createElement('optgroup');
@@ -674,7 +692,7 @@
 
         window.updateHeroSelect = function(roleSelect) {
             const heroSelect = roleSelect.parentElement.querySelectorAll('select')[2];
-            heroSelect.innerHTML = '<option value="">Keiner</option>';
+            heroSelect.innerHTML = '<option value="">Held wählen</option>';
             if (heroesByRole[roleSelect.value]) {
                 heroesByRole[roleSelect.value].forEach(h => {
                     const opt = document.createElement('option');
@@ -690,23 +708,23 @@
             if (!container || container.children.length >= 5) return;
             const index = container.children.length;
             const div = document.createElement('div');
-            div.className = "flex gap-2 items-center animate-in";
+            div.className = "flex gap-3 items-center animate-in bg-white/[0.02] p-3 rounded-2xl border border-white/5";
             const defaultRole = index >= 3 ? 'support' : (index === 0 ? 'tank' : 'dps');
             div.innerHTML = `
-                <div class="grid grid-cols-3 gap-2 flex-1">
-                    <select class="custom-select p-3 bg-[#0b0e17] border border-white/5 rounded-xl text-xs outline-none font-bold">
+                <div class="grid grid-cols-3 gap-3 flex-1">
+                    <select class="custom-select p-3 bg-[#0f172a] border border-white/10 rounded-xl text-xs outline-none font-bold text-white">
                         ${knownPlayers.map((p, i) => `<option ${i === index ? 'selected' : ''}>${p}</option>`).join('')}
                     </select>
-                    <select onchange="window.updateHeroSelect(this)" class="custom-select p-3 bg-[#0b0e17] border border-white/5 rounded-xl text-xs outline-none text-slate-400 font-bold">
+                    <select onchange="window.updateHeroSelect(this)" class="custom-select p-3 bg-[#0f172a] border border-white/10 rounded-xl text-xs outline-none text-slate-400 font-bold">
                         <option value="tank" ${defaultRole === 'tank' ? 'selected' : ''}>🛡️ Tank</option>
                         <option value="dps" ${defaultRole === 'dps' ? 'selected' : ''}>⚔️ DPS</option>
                         <option value="support" ${defaultRole === 'support' ? 'selected' : ''}>➕ Support</option>
                     </select>
-                    <select class="custom-select p-3 bg-[#0b0e17] border border-white/5 rounded-xl text-xs outline-none font-bold">
-                        <option value="">Keiner</option>
+                    <select class="custom-select p-3 bg-[#0f172a] border border-white/10 rounded-xl text-xs outline-none font-bold text-white">
+                        <option value="">Held wählen</option>
                     </select>
                 </div>
-                <button onclick="this.parentElement.remove(); window.updateAddButtonState();" class="p-3 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all">🗑️</button>
+                <button onclick="this.parentElement.remove(); window.updateAddButtonState();" class="p-3 text-red-500/40 hover:text-red-500 transition-colors">🗑️</button>
             `;
             container.appendChild(div);
             window.updateHeroSelect(div.querySelectorAll('select')[1]);
@@ -807,18 +825,18 @@
             const list = document.getElementById('ticketsList');
             if(!list) return;
             list.innerHTML = tickets.map(t => `
-                <div class="glass-card p-4 space-y-2 border-l-4 ${t.status === 'Abgeschlossen' ? 'ticket-closed' : (t.type === 'Problem' ? 'ticket-bug' : 'ticket-open')} transition-all">
+                <div class="glass-card p-5 space-y-3 ${t.status === 'Abgeschlossen' ? 'ticket-closed' : (t.type === 'Problem' ? 'ticket-bug' : 'ticket-open')} transition-all border-white/5">
                     <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">${t.type} · ${t.date}</span>
-                        <div class="flex gap-2">
-                             <button onclick="window.toggleTicketStatus(${t.id})" class="text-[10px] hover:scale-110 transition-transform">${t.status === 'Abgeschlossen' ? '✅' : '✔️'}</button>
-                             <button onclick="window.deleteTicket(${t.id})" class="text-[10px] hover:scale-110 transition-transform opacity-40 hover:opacity-100">🗑️</button>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">${t.type} · ${t.date}</span>
+                        <div class="flex gap-3">
+                             <button onclick="window.toggleTicketStatus(${t.id})" class="text-[12px] hover:scale-110 transition-transform p-1 bg-white/5 rounded-lg border border-white/10">${t.status === 'Abgeschlossen' ? '✅' : '✔️'}</button>
+                             <button onclick="window.deleteTicket(${t.id})" class="text-[12px] hover:scale-110 transition-transform opacity-40 hover:opacity-100 p-1 bg-white/5 rounded-lg border border-white/10">🗑️</button>
                         </div>
                     </div>
-                    <p class="text-[11px] font-bold text-white leading-relaxed break-words ${t.status === 'Abgeschlossen' ? 'line-through text-slate-500' : ''}">${t.message}</p>
-                    <div class="flex justify-between items-center">
-                        <p class="text-[9px] text-slate-600 font-bold italic text-ellipsis overflow-hidden whitespace-nowrap max-w-[150px]">Von: ${t.author}</p>
-                        <span class="text-[8px] bg-white/5 px-1.5 py-0.5 rounded text-slate-400 font-bold uppercase">${t.status}</span>
+                    <p class="text-[12px] font-bold text-slate-200 leading-relaxed break-words ${t.status === 'Abgeschlossen' ? 'line-through text-slate-500' : ''}">${t.message}</p>
+                    <div class="flex justify-between items-center pt-2 border-t border-white/5">
+                        <p class="text-[10px] text-slate-600 font-bold italic text-ellipsis overflow-hidden whitespace-nowrap max-w-[150px]">Reporter: ${t.author}</p>
+                        <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded-lg text-slate-400 font-black uppercase tracking-tighter">${t.status}</span>
                     </div>
                 </div>
             `).join('');
@@ -856,10 +874,9 @@
                 if (filtered.length > 0) {
                     document.getElementById('lastPlayedDate').innerText = filtered[0].date;
                 } else {
-                    document.getElementById('lastPlayedDate').innerText = "-";
+                    document.getElementById('lastPlayedDate').innerText = "Keine Daten";
                 }
 
-                // Chart Update
                 updateStatsChart(wins, losses);
 
                 let curW = 0, curL = 0, maxW = 0, maxL = 0;
@@ -882,7 +899,7 @@
                     }
                 });
                 const sorted = Object.entries(combos).sort((a,b) => (b[1].wins/b[1].total) - (a[1].wins/a[1].total));
-                const renderC = (name, s) => `<div class="glass-card p-4 flex justify-between items-center bg-white/[0.01]"><div><p class="text-xs font-black text-orange-500 uppercase tracking-widest leading-none mb-1">${Math.round((s.wins/s.total)*100)}% Winrate</p><p class="text-[11px] font-bold text-slate-400">${name}</p></div><p class="text-[10px] font-black text-slate-600 bg-black/40 px-2 py-1 rounded-md italic">${s.total} Matches</p></div>`;
+                const renderC = (name, s) => `<div class="glass-card p-4 flex justify-between items-center bg-white/[0.03] border-white/10"><div><p class="text-[11px] font-black text-orange-500 uppercase tracking-widest leading-none mb-1.5">${Math.round((s.wins/s.total)*100)}% Winrate</p><p class="text-xs font-bold text-slate-300">${name}</p></div><p class="text-[10px] font-black text-slate-500 bg-black/30 px-2 py-1 rounded-lg italic border border-white/5">${s.total} Gms</p></div>`;
                 document.getElementById('bestCombos').innerHTML = sorted.slice(0, 3).map(([n,s]) => renderC(n,s)).join('');
                 document.getElementById('worstCombos').innerHTML = [...sorted].reverse().slice(0, 3).map(([n,s]) => renderC(n,s)).join('');
             } catch(e) { console.error(e); }
@@ -894,11 +911,10 @@
 
             if(statsChart) statsChart.destroy();
 
-            // Falls keine Daten da sind, ein graues Diagramm anzeigen
             const hasData = wins > 0 || losses > 0;
             const data = hasData ? [wins, losses] : [1];
-            const colors = hasData ? ['#10b981', '#ef4444'] : ['#1e253c'];
-            const labels = hasData ? ['Wins', 'Losses'] : ['Keine Matches'];
+            const colors = hasData ? ['#22c55e', '#ef4444'] : ['#334155'];
+            const labels = hasData ? ['Wins', 'Losses'] : ['Keine Daten'];
 
             statsChart = new Chart(ctx, {
                 type: 'doughnut',
@@ -907,10 +923,11 @@
                     datasets: [{
                         data: data,
                         backgroundColor: colors,
-                        borderColor: 'transparent',
-                        hoverOffset: 10,
-                        cutout: '75%',
-                        borderRadius: 5
+                        borderColor: 'rgba(255,255,255,0.05)',
+                        borderWidth: 4,
+                        hoverOffset: 12,
+                        cutout: '72%',
+                        borderRadius: 8
                     }]
                 },
                 options: {
@@ -920,7 +937,7 @@
                         legend: { display: false }
                     },
                     animation: {
-                        duration: 1000,
+                        duration: 1200,
                         easing: 'easeOutQuart'
                     }
                 }
@@ -943,11 +960,11 @@
                         const list = cat === 'ranked' ? ranksRanked : ranksStadium;
                         const pref = cat === 'ranked' ? 'icon' : 'emoji';
                         return `
-                        <div class="flex items-center justify-between mb-1.5 bg-[#161a2b] border border-white/5 rounded-md px-1.5 py-1">
-                            <span class="text-[10px] font-bold flex items-center gap-1 text-slate-300 shrink-0 w-14">
+                        <div class="flex items-center justify-between mb-2 bg-[#0f172a] border border-white/10 rounded-xl px-3 py-1.5 shadow-sm">
+                            <span class="text-[10px] font-black flex items-center gap-1.5 text-slate-400 shrink-0 w-16">
                                 <span class="${roles[r].color}">${roles[r].icon}</span> <span class="truncate">${roles[r].name}</span>
                             </span>
-                            <select onchange="window.savePlayerRank('${pName}', '${cat}', '${r}', this.value)" class="custom-select flex-1 min-w-0 bg-transparent outline-none text-[10px] font-bold text-orange-500 text-right py-1">
+                            <select onchange="window.savePlayerRank('${pName}', '${cat}', '${r}', this.value)" class="custom-select flex-1 min-w-0 bg-transparent outline-none text-[11px] font-black text-orange-500 text-right py-1">
                                 <option value="-">-</option>
                                 ${list.map(rr => {
                                     let os = '';
@@ -966,7 +983,7 @@
                         let p = m.players.find(x => x.name === pName);
                         if(p && roleStats[p.role]) {
                             roleStats[p.role].t++; if(m.result === 'Win') roleStats[p.role].w++;
-                            if(p.hero && p.hero !== "Keiner") {
+                            if(p.hero && p.hero !== "Held wählen") {
                                 if(!heroStats[p.hero]) heroStats[p.hero] = {w:0, t:0};
                                 heroStats[p.hero].t++; if(m.result === 'Win') heroStats[p.hero].w++;
                             }
@@ -977,34 +994,34 @@
                     const flopHero = [...validH].reverse()[0];
                     const isOpen = openPlayerDetails.has(pName);
                     const div = document.createElement('div');
-                    div.className = "glass-card p-5 animate-in flex flex-col";
+                    div.className = "glass-card p-6 animate-in flex flex-col border-white/10";
                     div.innerHTML = `
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-black text-white">${pName}</h2>
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-black text-white italic tracking-tighter">${pName}</h2>
                             <div class="text-right">
-                                <div class="text-[16px] font-black text-[var(--text-yellow)]">${total > 0 ? Math.round((wins/total)*100) : 0}% <span class="text-[9px] text-slate-500 font-bold uppercase">WR</span></div>
-                                <div class="text-[9px] text-slate-400 font-bold uppercase">${total} Matches</div>
+                                <div class="text-xl font-black text-[var(--text-yellow)] drop-shadow-sm">${total > 0 ? Math.round((wins/total)*100) : 0}% <span class="text-[10px] text-slate-500 font-black uppercase tracking-tighter ml-1">WR</span></div>
+                                <div class="text-[9px] text-slate-500 font-black uppercase tracking-[0.1em]">${total} Matches</div>
                             </div>
                         </div>
-                        <div class="border border-white/5 rounded-xl p-2 grid grid-cols-2 gap-2 mb-4 bg-black/20">
-                            <div><div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Rangliste</div>${createSelects('ranked')}</div>
-                            <div><div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Stadion</div>${createSelects('stadium')}</div>
+                        <div class="border border-white/5 rounded-2xl p-3 grid grid-cols-2 gap-3 mb-6 bg-black/20">
+                            <div><div class="text-[9px] text-slate-600 uppercase tracking-widest mb-2 font-black px-1">Rangliste</div>${createSelects('ranked')}</div>
+                            <div><div class="text-[9px] text-slate-600 uppercase tracking-widest mb-2 font-black px-1">Stadion</div>${createSelects('stadium')}</div>
                         </div>
-                        <button onclick="window.toggleDetails('${pName}')" id="btn-${pName}" class="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/5 transition-all">
-                            ${isOpen ? 'Details ausblenden' : 'Details anzeigen'}
+                        <button onclick="window.toggleDetails('${pName}')" id="btn-${pName}" class="w-full py-3 bg-white/5 hover:bg-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/10 transition-all">
+                            ${isOpen ? 'Details Ausblenden' : 'Details Anzeigen'}
                         </button>
-                        <div id="details-${pName}" class="player-details space-y-4 pt-4 ${isOpen ? 'open' : ''}">
-                            <div class="grid grid-cols-3 gap-2">
-                                ${['tank', 'dps', 'support'].map(r => `<div class="border border-white/5 bg-white/[0.02] rounded-xl flex flex-col items-center py-3"><div class="text-sm mb-1 ${roles[r].color}">${roles[r].icon}</div><div class="text-sm font-black text-white">${roleStats[r].t > 0 ? Math.round((roleStats[r].w/roleStats[r].t)*100) : '-'}%</div><div class="text-[8px] text-slate-600 font-bold">${roleStats[r].t}x</div></div>`).join('')}
+                        <div id="details-${pName}" class="player-details space-y-6 pt-6 ${isOpen ? 'open' : ''}">
+                            <div class="grid grid-cols-3 gap-3">
+                                ${['tank', 'dps', 'support'].map(r => `<div class="border border-white/10 bg-white/[0.03] rounded-2xl flex flex-col items-center py-4 shadow-inner"><div class="text-lg mb-1.5 ${roles[r].color}">${roles[r].icon}</div><div class="text-[13px] font-black text-white">${roleStats[r].t > 0 ? Math.round((roleStats[r].w/roleStats[r].t)*100) : '-'}%</div><div class="text-[9px] text-slate-600 font-black uppercase">${roleStats[r].t}x</div></div>`).join('')}
                             </div>
-                            <div class="grid grid-cols-2 gap-4 text-[10px]">
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">🏆 Top Held</p><p class="font-bold text-white">${topHero ? topHero[0] : '-'}</p></div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">📉 Flop Held</p><p class="font-bold text-white">${flopHero ? flopHero[0] : '-'}</p></div>
+                            <div class="grid grid-cols-2 gap-6 text-[10px]">
+                                <div><p class="text-[10px] font-black text-slate-500 uppercase mb-2 flex items-center gap-1"><span class="text-green-500">🏆</span> Top Held</p><p class="font-black text-white text-xs tracking-tight">${topHero ? topHero[0] : '-'}</p></div>
+                                <div><p class="text-[10px] font-black text-slate-500 uppercase mb-2 flex items-center gap-1"><span class="text-red-500">📉</span> Flop Held</p><p class="font-black text-white text-xs tracking-tight">${flopHero ? flopHero[0] : '-'}</p></div>
                             </div>
-                            <div class="pt-2 border-t border-white/5">
-                                <table class="w-full text-[9px] text-slate-300 font-bold uppercase">
+                            <div class="pt-4 border-t border-white/5">
+                                <table class="w-full text-[10px] text-slate-300 font-bold uppercase tracking-wider">
                                     <tbody>
-                                        ${pMatches.slice(0, 5).map(m => `<tr class="border-b border-white/5 last:border-0"><td class="py-2 opacity-60">${m.date.slice(0, 5)}</td><td class="py-2 ${m.result === 'Win' ? 'text-green-400' : 'text-red-400'}">${m.result}</td><td class="py-2 text-right">${roles[m.players.find(p => p.name === pName).role].icon}</td></tr>`).join('')}
+                                        ${pMatches.slice(0, 5).map(m => `<tr class="border-b border-white/5 last:border-0"><td class="py-2.5 opacity-60">${m.date.slice(0, 5)}</td><td class="py-2.5 ${m.result === 'Win' ? 'text-green-400 font-black' : 'text-red-500'}">${m.result}</td><td class="py-2.5 text-right text-sm">${roles[m.players.find(p => p.name === pName).role].icon}</td></tr>`).join('')}
                                     </tbody>
                                 </table>
                             </div>
@@ -1020,14 +1037,17 @@
             const list = document.getElementById('recentMatchesList');
             if(!list) return;
             list.innerHTML = matches.slice(0, 15).map(m => `
-                <div class="glass-card p-5 space-y-3 relative group animate-in">
-                    <button onclick="window.deleteMatch(${m.id})" class="absolute right-4 top-4 opacity-0 group-hover:opacity-100 text-red-500/40 hover:text-red-500">🗑️</button>
+                <div class="glass-card p-6 space-y-4 relative group animate-in border-white/5 hover:border-white/20 transition-all">
+                    <button onclick="window.deleteMatch(${m.id})" class="absolute right-5 top-5 opacity-0 group-hover:opacity-100 text-red-500/40 hover:text-red-500 transition-opacity p-2">🗑️</button>
                     <div class="flex justify-between items-start">
-                        <div><div class="text-[11px] font-black uppercase italic ${m.result === 'Win' ? 'text-green-500' : 'text-red-500'}">${m.result === 'Win' ? 'Victory' : 'Defeat'}</div><div class="text-[9px] text-slate-500 font-black mt-1 uppercase">S${m.season} · ${m.type} · ${m.rank}</div></div>
-                        ${m.score ? `<div class="text-[10px] font-black text-orange-500 bg-orange-500/10 px-2 py-1 rounded-lg">${m.score}</div>` : ''}
+                        <div>
+                            <div class="text-[12px] font-black uppercase italic tracking-tighter ${m.result === 'Win' ? 'text-green-400' : 'text-red-500'}">${m.result === 'Win' ? 'Victory' : 'Defeat'}</div>
+                            <div class="text-[10px] text-slate-500 font-black mt-1 uppercase tracking-[0.1em]">S${m.season} · ${m.type} · ${m.rank}</div>
+                        </div>
+                        ${m.score ? `<div class="text-[11px] font-black text-orange-500 bg-orange-500/10 px-3 py-1.5 rounded-xl border border-orange-500/20 shadow-sm">${m.score}</div>` : ''}
                     </div>
-                    <div class="flex flex-wrap gap-2">${(m.players || []).map(p => `<div class="bg-white/[0.03] border border-white/5 px-2 py-1 rounded-full text-[9px] font-black text-slate-300 uppercase flex items-center gap-1"><span>${roles[p.role].icon}</span> ${p.name} <span class="text-slate-600 italic">${p.hero !== 'Keiner' ? p.hero : ''}</span></div>`).join('')}</div>
-                    <div class="text-[9px] text-slate-600 font-bold border-t border-white/5 pt-2 flex justify-between"><span>${m.date}</span><span>${m.map || ''}</span></div>
+                    <div class="flex flex-wrap gap-2.5">${(m.players || []).map(p => `<div class="bg-white/[0.04] border border-white/10 px-3 py-1.5 rounded-xl text-[10px] font-black text-slate-200 uppercase flex items-center gap-1.5 shadow-sm"><span>${roles[p.role].icon}</span> ${p.name} <span class="text-slate-600 italic font-medium ml-1">${p.hero !== 'Held wählen' ? p.hero : ''}</span></div>`).join('')}</div>
+                    <div class="text-[10px] text-slate-600 font-black border-t border-white/5 pt-3 flex justify-between uppercase tracking-tighter"><span>${m.date}</span><span>${m.map || 'Keine Map'}</span></div>
                 </div>`).join('');
         }
 
@@ -1038,7 +1058,7 @@
 
         function showBanner(text, type) {
             const banner = document.createElement('div');
-            banner.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-[2rem] text-xs font-black z-[100] ${type === 'error' ? 'bg-red-600' : 'bg-green-600'} text-white border border-white/20 animate-in tracking-widest uppercase italic shadow-2xl`;
+            banner.className = `fixed bottom-12 left-1/2 -translate-x-1/2 px-10 py-5 rounded-[2.5rem] text-[11px] font-black z-[100] ${type === 'error' ? 'bg-red-600' : 'bg-green-600'} text-white border border-white/20 animate-in tracking-[0.2em] uppercase italic shadow-2xl`;
             banner.innerText = text; document.body.appendChild(banner);
             setTimeout(() => banner.remove(), 3500);
         }
