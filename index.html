@@ -31,13 +31,6 @@
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
 
-        .stat-box {
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--card-border);
-            border-radius: 1rem;
-            padding: 1rem;
-        }
-
         .btn-toggle {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -71,11 +64,9 @@
             border-radius: 2px;
         }
 
-        /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
@@ -87,9 +78,20 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Native selects verstecken */
         select.custom-select {
             display: none;
+        }
+
+        /* Detail-Sektion Animation */
+        .player-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
+            opacity: 0;
+        }
+        .player-details.open {
+            max-height: 1500px;
+            opacity: 1;
         }
     </style>
 </head>
@@ -97,7 +99,7 @@
 
     <nav class="border-b border-white/5 py-4 px-8 sticky top-0 bg-[#0b0e17]/90 backdrop-blur-xl z-40 flex items-center justify-between">
         <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.showPage('dashboard')">
                 <div class="w-9 h-9 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
                 </div>
@@ -106,14 +108,17 @@
             
             <div class="hidden md:flex items-center gap-2 bg-slate-500/10 border border-slate-500/20 px-3 py-1 rounded-full" id="cloudStatusContainer">
                 <span class="w-1.5 h-1.5 bg-slate-500 rounded-full" id="cloudStatusDot"></span>
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest" id="cloudStatus">Verbinde...</span>
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest" id="cloudStatus">Initialisiere...</span>
             </div>
         </div>
 
-        <div class="flex gap-8">
+        <div class="flex gap-4 md:gap-8">
             <button onclick="window.showPage('dashboard')" id="nav-dashboard" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Dashboard</button>
             <button onclick="window.showPage('players')" id="nav-players" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Spieler</button>
             <button onclick="window.showPage('entry')" id="nav-entry" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Eintragen</button>
+            <button onclick="window.showPage('tickets')" id="nav-tickets" class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 bg-red-500 rounded-full hidden" id="ticketAlert"></span> Tickets
+            </button>
         </div>
     </nav>
 
@@ -197,6 +202,51 @@
         <!-- PLAYERS -->
         <div id="page-players" class="page hidden animate-in">
              <div id="playersGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- TICKETS -->
+        <div id="page-tickets" class="page hidden grid grid-cols-1 md:grid-cols-3 gap-6 animate-in">
+            <div class="md:col-span-2 glass-card p-8 space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center text-red-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-black italic uppercase tracking-tighter">Support & Feedback</h2>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Problem melden oder Features vorschlagen</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Kategorie</label>
+                        <select id="ticketType" class="custom-select w-full bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold">
+                            <option value="Problem">⚠️ Problem / Bug</option>
+                            <option value="Feature">✨ Feature Vorschlag</option>
+                            <option value="Content">🗺️ Fehlende Maps/Helden</option>
+                            <option value="Sonstiges">❓ Sonstiges</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Dein Name / BattleTag</label>
+                        <input type="text" id="ticketAuthor" placeholder="Pudelmuetze#1234" class="w-full bg-[#0b0e17] border border-white/5 p-3.5 rounded-xl outline-none text-xs font-bold">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Beschreibung</label>
+                    <textarea id="ticketMessage" rows="5" placeholder="Was funktioniert nicht? Was fehlt dir?" class="w-full bg-[#0b0e17] border border-white/5 p-4 rounded-xl outline-none text-xs font-medium resize-none"></textarea>
+                </div>
+
+                <button onclick="window.saveTicket()" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-xl font-black uppercase tracking-[0.2em] shadow-lg shadow-red-600/20 transition-all">
+                    Ticket absenden
+                </button>
+            </div>
+
+            <div class="glass-card p-6 space-y-5 flex flex-col">
+                <h2 class="text-xs font-black uppercase tracking-widest italic text-slate-400">Aktuelle Tickets</h2>
+                <div id="ticketsList" class="space-y-3 overflow-y-auto max-h-[600px] custom-scrollbar pr-2"></div>
+            </div>
         </div>
 
         <!-- ENTRY -->
@@ -305,6 +355,7 @@
         // State
         let matches = [];
         let playerRanks = {};
+        let tickets = [];
         let currentSeason = 21;
         let currentViewMode = 'Alle';
         let currentMatchType = 'Rangliste';
@@ -403,8 +454,6 @@
                             dropdown.classList.remove('opacity-100', 'visible');
                             dropdown.classList.add('opacity-0', 'invisible');
                             select.dispatchEvent(new Event('change', { bubbles: true }));
-                            Array.from(dropdown.querySelectorAll('div.cursor-pointer')).forEach(c => c.classList.remove('text-orange-400', 'bg-white/5', 'font-bold'));
-                            item.classList.add('text-orange-400', 'bg-white/5', 'font-bold');
                         });
                         dropdown.appendChild(item);
                     };
@@ -460,19 +509,16 @@
             if (!db) return;
             setCloudStatus('Verbinde...', 'warn');
             
-            // Matches Sync - Source of Truth: Cloud Snapshot
+            // Matches Sync
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), (snapshot) => {
                 setCloudStatus('Cloud Sync Active', 'success');
-                // Wir überschreiben die lokale Liste mit dem Server-Stand, damit Löschungen synchronisiert werden
                 matches = snapshot.docs.map(d => d.data());
                 matches.sort((a, b) => (b.id || 0) - (a.id || 0));
                 localStorage.setItem('ow_stats_v2', JSON.stringify(matches));
                 refreshCurrentPage();
-            }, (error) => {
-                console.error("Firebase Sync Fehler:", error);
-                setCloudStatus('DB Regeln prüfen!', 'error');
-            });
+            }, (error) => console.error("Firebase Sync Fehler:", error));
 
+            // Ranks Sync
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks'), (docSnap) => {
                 if (docSnap.exists()) {
                     playerRanks = docSnap.data();
@@ -482,12 +528,27 @@
                     window.updatePlayerDashboards();
                 }
             });
+
+            // Tickets Sync
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'tickets'), (snapshot) => {
+                const newTickets = snapshot.docs.map(d => d.data());
+                newTickets.sort((a, b) => (b.id || 0) - (a.id || 0));
+                
+                if(newTickets.length > tickets.length && tickets.length > 0) {
+                    document.getElementById('ticketAlert').classList.remove('hidden');
+                }
+                tickets = newTickets;
+                if (!document.getElementById('page-tickets').classList.contains('hidden')) {
+                    window.updateTicketsList();
+                }
+            });
         }
 
         function refreshCurrentPage() {
             if (!document.getElementById('page-dashboard').classList.contains('hidden')) window.updateDashboard();
             if (!document.getElementById('page-players').classList.contains('hidden')) window.updatePlayerDashboards();
             if (!document.getElementById('page-entry').classList.contains('hidden')) window.updateRecentMatches();
+            if (!document.getElementById('page-tickets').classList.contains('hidden')) window.updateTicketsList();
         }
 
         window.importData = function(event) {
@@ -497,12 +558,8 @@
             reader.onload = (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if(data.matches) {
-                        data.matches.forEach(m => setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), m.id.toString()), m));
-                    }
-                    if(data.playerRanks) {
-                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks'), data.playerRanks);
-                    }
+                    if(data.matches) data.matches.forEach(m => setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), m.id.toString()), m));
+                    if(data.playerRanks) setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks'), data.playerRanks);
                     showBanner("Import erfolgreich!", "success");
                 } catch (err) { showBanner("Import fehlgeschlagen!", "error"); }
             };
@@ -535,6 +592,12 @@
         window.showPage = function(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById(`page-${id}`).classList.remove('hidden');
+            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-white', 'text-slate-400'));
+            const activeBtn = document.getElementById(`nav-${id}`);
+            if(activeBtn) activeBtn.classList.replace('text-slate-400', 'text-white');
+            
+            if(id === 'tickets') document.getElementById('ticketAlert').classList.add('hidden');
+            
             refreshCurrentPage();
         }
 
@@ -550,6 +613,7 @@
         window.updateRankOptions = function(skipInit = false) {
             const startSelect = document.getElementById('matchRankStart');
             const endSelect = document.getElementById('matchRankEnd');
+            if(!startSelect) return;
             startSelect.innerHTML = '<option value="-">-</option>';
             endSelect.innerHTML = '<option value="-">-</option>';
             const list = currentMatchType === 'Rangliste' ? ranksRanked : ranksStadium;
@@ -566,6 +630,7 @@
 
         window.updateMapOptions = function(skipInit = false) {
             const mapSelect = document.getElementById('matchMap');
+            if(!mapSelect) return;
             mapSelect.innerHTML = '<option value="">Keine Karte</option>';
             const categories = mapsByType[currentMatchType === 'Rangliste' ? 'ranked' : 'stadium'];
             for (const [cat, maps] of Object.entries(categories)) {
@@ -602,7 +667,7 @@
 
         window.addPlayerToMatch = function() {
             const container = document.getElementById('matchPlayersList');
-            if (container.children.length >= 5) return;
+            if (!container || container.children.length >= 5) return;
             const index = container.children.length;
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center animate-in";
@@ -678,6 +743,60 @@
             }
         }
 
+        // --- TICKETS LOGIC ---
+        window.saveTicket = function() {
+            const author = document.getElementById('ticketAuthor').value.trim();
+            const type = document.getElementById('ticketType').value;
+            const msg = document.getElementById('ticketMessage').value.trim();
+            
+            if(!author || !msg) { showBanner("Bitte alle Felder ausfüllen!", "error"); return; }
+            
+            const ticket = {
+                id: Date.now(),
+                author, type, message: msg,
+                date: new Date().toLocaleDateString('de-DE'),
+                status: 'Offen'
+            };
+            
+            if(currentUser && db) {
+                setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'tickets'), ticket.id.toString()), ticket)
+                .then(() => {
+                    showBanner("Ticket gesendet!", "success");
+                    document.getElementById('ticketAuthor').value = '';
+                    document.getElementById('ticketMessage').value = '';
+                });
+            }
+        }
+
+        window.updateTicketsList = function() {
+            const list = document.getElementById('ticketsList');
+            if(!list) return;
+            list.innerHTML = tickets.map(t => `
+                <div class="glass-card p-4 space-y-2 border-l-4 ${t.type === 'Problem' ? 'border-red-500' : t.type === 'Feature' ? 'border-blue-500' : 'border-slate-500'}">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">${t.type} · ${t.date}</span>
+                        <span class="text-[8px] bg-white/5 px-1.5 py-0.5 rounded text-slate-400 font-bold">${t.status}</span>
+                    </div>
+                    <p class="text-[11px] font-bold text-white leading-relaxed break-words">${t.message}</p>
+                    <p class="text-[9px] text-slate-600 font-bold italic">Von: ${t.author}</p>
+                </div>
+            `).join('');
+        }
+
+        window.toggleDetails = function(pName) {
+            const el = document.getElementById(`details-${pName}`);
+            const btn = document.getElementById(`btn-${pName}`);
+            const isOpen = el.classList.contains('open');
+            
+            if(isOpen) {
+                el.classList.remove('open');
+                btn.innerText = "Details anzeigen";
+            } else {
+                el.classList.add('open');
+                btn.innerText = "Details ausblenden";
+            }
+        }
+
         window.updateDashboard = function() {
             try {
                 const filtered = matches.filter(m => m.season === currentSeason && (currentViewMode === 'Alle' || m.type === currentViewMode));
@@ -688,13 +807,7 @@
                 document.getElementById('globalLosses').innerText = total - wins;
                 document.getElementById('globalLeavers').innerText = leavers;
                 document.getElementById('globalLeaverPerc').innerText = total > 0 ? Math.round((leavers / total) * 100) + "%" : "0%";
-                let curW = 0, curL = 0, maxW = 0, maxL = 0;
-                [...filtered].reverse().forEach(m => {
-                    if (m.result === 'Win') { curW++; curL = 0; if (curW > maxW) maxW = curW; }
-                    else { curL++; curW = 0; if (curL > maxL) maxL = curL; }
-                });
-                document.getElementById('maxWinStreak').innerText = maxW;
-                document.getElementById('maxLossStreak').innerText = maxL;
+                
                 const combos = {};
                 filtered.forEach(m => {
                     if (!m.players) return;
@@ -710,17 +823,21 @@
                 const renderC = (name, s) => `<div class="glass-card p-4 flex justify-between items-center bg-white/[0.01]"><div><p class="text-xs font-black text-orange-500 uppercase tracking-widest leading-none mb-1">${Math.round((s.wins/s.total)*100)}% Winrate</p><p class="text-[11px] font-bold text-slate-400">${name}</p></div><p class="text-[10px] font-black text-slate-600 bg-black/40 px-2 py-1 rounded-md italic">${s.total} Matches</p></div>`;
                 document.getElementById('bestCombos').innerHTML = sorted.slice(0, 3).map(([n,s]) => renderC(n,s)).join('');
                 document.getElementById('worstCombos').innerHTML = [...sorted].reverse().slice(0, 3).map(([n,s]) => renderC(n,s)).join('');
-            } catch(e) { console.error("Dashboard Error", e); }
+            } catch(e) { console.error(e); }
         }
 
         window.updatePlayerDashboards = function() {
             try {
-                const grid = document.getElementById('playersGrid'); grid.innerHTML = "";
+                const grid = document.getElementById('playersGrid'); 
+                if(!grid) return;
+                grid.innerHTML = "";
                 const seasonMatches = matches.filter(m => m.season === currentSeason && (currentViewMode === 'Alle' || m.type === currentViewMode));
+                
                 knownPlayers.forEach(pName => {
                     const pMatches = seasonMatches.filter(m => m.players.some(p => p.name === pName));
-                    const total = pMatches.length, wins = pMatches.filter(m => m.result === 'Win').length, losses = total - wins;
+                    const total = pMatches.length, wins = pMatches.filter(m => m.result === 'Win').length;
                     const ranks = playerRanks[pName] || {};
+                    
                     const createSelects = (cat) => ['tank', 'dps', 'support'].map(r => {
                         const val = ranks[`${r}_${cat}`] || '-';
                         const list = cat === 'ranked' ? ranksRanked : ranksStadium;
@@ -761,42 +878,47 @@
                     const div = document.createElement('div');
                     div.className = "glass-card p-5 animate-in flex flex-col";
                     div.innerHTML = `
-                        <h2 class="text-xl font-black text-white mb-4">${pName}</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-black text-white">${pName}</h2>
+                            <div class="text-right">
+                                <div class="text-[16px] font-black text-[var(--text-yellow)]">${total > 0 ? Math.round((wins/total)*100) : 0}% <span class="text-[9px] text-slate-500 font-bold uppercase">WR</span></div>
+                                <div class="text-[9px] text-slate-400 font-bold uppercase">${total} Matches</div>
+                            </div>
+                        </div>
+
                         <div class="border border-white/5 rounded-xl p-2 grid grid-cols-2 gap-2 mb-4 bg-black/20">
                             <div><div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Rangliste</div>${createSelects('ranked')}</div>
                             <div><div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Stadion</div>${createSelects('stadium')}</div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2 mb-2">
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Winrate</div><div class="text-xl font-black text-[var(--text-yellow)]">${total > 0 ? Math.round((wins/total)*100) : 0}%</div></div>
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Matches</div><div class="text-xl font-black text-white">${total}</div></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 mb-4">
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Wins</div><div class="text-xl font-black text-green-400">${wins}</div></div>
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Losses</div><div class="text-xl font-black text-red-400">${losses}</div></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mb-4">
-                            ${['tank', 'dps', 'support'].map(r => `<div class="border border-white/5 bg-white/[0.02] rounded-xl flex flex-col items-center py-3"><div class="text-sm mb-1 ${roles[r].color}">${roles[r].icon}</div><div class="text-sm font-black text-white">${roleStats[r].t > 0 ? Math.round((roleStats[r].w/roleStats[r].t)*100) : '-'}%</div></div>`).join('')}
-                        </div>
-                        <div class="grid grid-cols-2 gap-4 mb-4 text-[10px]">
-                            <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">🏆 Top Held</p><p class="font-bold text-white">${topHero ? topHero[0] : '-'}</p></div>
-                            <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">📉 Flop Held</p><p class="font-bold text-white">${flopHero ? flopHero[0] : '-'}</p></div>
-                        </div>
-                        <div class="mt-auto pt-2 border-t border-white/5">
-                            <table class="w-full text-[9px] text-slate-300 font-bold uppercase">
-                                <tbody>
-                                    ${pMatches.slice(0, 5).map(m => `<tr class="border-b border-white/5 last:border-0"><td class="py-2 opacity-60">${m.date.slice(0, 5)}</td><td class="py-2 ${m.result === 'Win' ? 'text-green-400' : 'text-red-400'}">${m.result}</td><td class="py-2 text-right">${roles[m.players.find(p => p.name === pName).role].icon}</td></tr>`).join('')}
-                                </tbody>
-                            </table>
+
+                        <button onclick="window.toggleDetails('${pName}')" id="btn-${pName}" class="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-white/5 transition-all">Details anzeigen</button>
+
+                        <div id="details-${pName}" class="player-details space-y-4 pt-4">
+                            <div class="grid grid-cols-3 gap-2">
+                                ${['tank', 'dps', 'support'].map(r => `<div class="border border-white/5 bg-white/[0.02] rounded-xl flex flex-col items-center py-3"><div class="text-sm mb-1 ${roles[r].color}">${roles[r].icon}</div><div class="text-sm font-black text-white">${roleStats[r].t > 0 ? Math.round((roleStats[r].w/roleStats[r].t)*100) : '-'}%</div><div class="text-[8px] text-slate-600 font-bold">${roleStats[r].t}x</div></div>`).join('')}
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-[10px]">
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">🏆 Top Held</p><p class="font-bold text-white">${topHero ? topHero[0] : '-'}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">📉 Flop Held</p><p class="font-bold text-white">${flopHero ? flopHero[0] : '-'}</p></div>
+                            </div>
+                            <div class="pt-2 border-t border-white/5">
+                                <table class="w-full text-[9px] text-slate-300 font-bold uppercase">
+                                    <tbody>
+                                        ${pMatches.slice(0, 5).map(m => `<tr class="border-b border-white/5 last:border-0"><td class="py-2 opacity-60">${m.date.slice(0, 5)}</td><td class="py-2 ${m.result === 'Win' ? 'text-green-400' : 'text-red-400'}">${m.result}</td><td class="py-2 text-right">${roles[m.players.find(p => p.name === pName).role].icon}</td></tr>`).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     `;
                     grid.appendChild(div);
                 });
                 initCustomSelects(); 
-            } catch(e) { console.error("Player Render Error", e); }
+            } catch(e) { console.error(e); }
         }
 
         window.updateRecentMatches = function() {
             const list = document.getElementById('recentMatchesList');
+            if(!list) return;
             list.innerHTML = matches.slice(0, 15).map(m => `
                 <div class="glass-card p-5 space-y-3 relative group animate-in">
                     <button onclick="window.deleteMatch(${m.id})" class="absolute right-4 top-4 opacity-0 group-hover:opacity-100 text-red-500/40 hover:text-red-500">🗑️</button>
@@ -826,7 +948,9 @@
             if (user) setupCloudListeners();
         });
         signInAnonymously(auth).catch(e => setCloudStatus('Auth Error', 'error'));
-        window.showPage('entry');
+        
+        // --- INITIALISIERUNG ---
+        window.showPage('dashboard'); // Startet jetzt immer beim Dashboard
         window.updateRankOptions(true);
         window.updateMapOptions(true);
         window.addPlayerToMatch();
