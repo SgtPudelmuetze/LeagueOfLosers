@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
-<!-- Version: 1.26.00 - Added Map Stats & Multi-Hero Selection for Ranked -->
+<!-- Version: 1.28.00 - Fix Anime Scoring, Tooltips added, Full Words, Alpha-Sort Genres & Table Scaling -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -304,20 +304,80 @@
                         </div>
                     </div>
                     
-                    <!-- Mitte: 10 Kategorien extrem kompakt -->
+                    <!-- Mitte: 10 Kategorien ausgeschrieben mit Infos -->
                     <div class="space-y-2 pt-2">
                         <label class="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1 block">Punktevergabe (1 - 10)</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Story</span><input type="number" id="animeStory" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Anim.</span><input type="number" id="animeAnim" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Cast</span><input type="number" id="animeCast" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Entw.</span><input type="number" id="animeDev" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">World</span><input type="number" id="animeWorld" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Pacing</span><input type="number" id="animePacing" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Sound</span><input type="number" id="animeSound" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Voice</span><input type="number" id="animeVoice" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2 rounded-lg"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Impact</span><input type="number" id="animeImpact" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-white focus:outline-none"></div>
-                            <div class="flex items-center justify-between bg-gradient-to-r from-[#0f172a] to-[#1e293b] border border-yellow-500/30 p-2 rounded-lg"><span class="text-[9px] font-black text-yellow-500 uppercase tracking-widest ml-1">Enjoy</span><input type="number" id="animeEnjoy" min="1" max="10" value="5" oninput="window.calcAnimeRank()" class="w-10 bg-transparent text-xs font-bold text-right text-yellow-500 focus:outline-none"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Story & Plot</span>
+                                    <div title="Wie fesselnd, logisch und tiefgründig die Handlung ist." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animeStory" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Animation</span>
+                                    <div title="Qualität der Zeichnungen, flüssige Bewegungen und Effekte." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animeAnim" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Charaktere</span>
+                                    <div title="Wie sympathisch, interessant und relevant der Cast ist." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animeCast" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">Charakterentwicklung</span>
+                                    <div title="Wachstum und Reifung der Figuren im Verlauf der Serie." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic shrink-0">i</div>
+                                </div>
+                                <input type="number" id="animeDev" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Worldbuilding</span>
+                                    <div title="Wie detailliert und faszinierend die Anime-Welt gestaltet ist." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animeWorld" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Erzähltempo</span>
+                                    <div title="Das Pacing der Serie – weder zu gehetzt noch zu gestreckt." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animePacing" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Soundtrack</span>
+                                    <div title="Qualität von Hintergrundmusik, Openings und Endings." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animeSound" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Synchronisation</span>
+                                    <div title="Leistung der Synchronsprecher (Seiyū) und emotionale Tiefe." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animeVoice" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-[#0f172a] border border-slate-700 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">Emotionale Wirkung</span>
+                                    <div title="Wie stark dich der Anime emotional berührt und mitreißt." class="cursor-help w-3 h-3 flex items-center justify-center bg-slate-600 hover:bg-slate-400 text-white text-[8px] rounded-full transition-colors font-serif italic shrink-0">i</div>
+                                </div>
+                                <input type="number" id="animeImpact" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-white focus:outline-none">
+                            </div>
+                            <div class="flex items-center justify-between bg-gradient-to-r from-[#0f172a] to-[#1e293b] border border-yellow-500/30 p-2.5 rounded-lg">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-black text-yellow-500 uppercase tracking-widest ml-1">Spaßfaktor</span>
+                                    <div title="Dein persönliches Enjoyment, unabhängig von objektiven Kriterien." class="cursor-help w-3 h-3 flex items-center justify-center bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-500 text-[8px] rounded-full transition-colors font-serif italic">i</div>
+                                </div>
+                                <input type="number" id="animeEnjoy" min="1" max="10" value="5" oninput="window.calcAnimeRank()" onblur="window.enforceBounds(this)" class="w-10 bg-transparent text-sm font-bold text-right text-yellow-500 focus:outline-none">
+                            </div>
                         </div>
                     </div>
 
@@ -370,12 +430,8 @@
                     <div class="md:col-span-2">
                         <h3 class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Alle Genres & Kategorien</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-[9px] font-medium text-slate-300">
-                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Shōnen</strong> Aktion/Jungs</div>
-                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Shōjo</strong> Romantik/Mädchen</div>
-                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Seinen</strong> Reifer/Erwachsene</div>
-                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Josei</strong> Frauen/Drama</div>
-                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Action</strong> Kämpfe/Tempo</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Abenteuer</strong> Reise/Entdeckung</div>
+                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Action</strong> Kämpfe/Tempo</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Comedy</strong> Humor/Gags</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Drama</strong> Ernst/Konflikt</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Ecchi</strong> Leichte Erotik</div>
@@ -384,17 +440,21 @@
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Historisch</strong> Vergangenheit</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Horror</strong> Grusel/Angst</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Isekai</strong> Andere Welt</div>
+                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Josei</strong> Frauen/Drama</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Mecha</strong> Riesenroboter</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Musik</strong> Idols/Bands</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Mystery</strong> Geheimnisse</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Psychological</strong> Mindgames/Psyche</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Romance</strong> Liebe/Paare</div>
+                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">School</strong> Schul-Setting</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Sci-Fi</strong> Zukunft/Tech</div>
+                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Seinen</strong> Reifer/Erwachsene</div>
+                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Shōjo</strong> Romantik/Mädchen</div>
+                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Shōnen</strong> Aktion/Jungs</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Slice of Life</strong> Alltag/Realistisch</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Sports</strong> Wettkampf</div>
-                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Thriller</strong> Spannung/Gefahr</div>
                             <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Supernatural</strong> Übernatürlich</div>
-                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">School</strong> Schul-Setting</div>
+                            <div class="bg-[#0f172a] px-2 py-1.5 rounded-lg border border-white/5"><strong class="text-white uppercase mr-1">Thriller</strong> Spannung/Gefahr</div>
                         </div>
                     </div>
                 </div>
@@ -418,7 +478,7 @@
                                 <th class="py-2 sm:py-3 px-2 sm:px-4 font-black">Titel & Details</th>
                                 <th class="py-2 sm:py-3 px-2 sm:px-4 text-center font-black w-20 sm:w-24">Score</th>
                                 <th class="py-2 sm:py-3 px-2 sm:px-4 text-center font-black w-20 sm:w-24">Rang</th>
-                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-right font-black w-14 sm:w-16" id="animeTableActionHead">Aktion</th>
+                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-right font-black whitespace-nowrap w-auto" id="animeTableActionHead">Aktion</th>
                             </tr>
                         </thead>
                         <tbody id="animesListBody">
@@ -478,7 +538,7 @@
                         <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Season</label>
                         <select id="matchSeason" class="custom-select w-full bg-[#1e293b] border border-white/10 p-3 sm:p-4 rounded-xl outline-none text-xs sm:text-sm text-orange-500 font-black italic">
                             <option value="21" selected>Season 21</option>
-                            <option value="22" selected>Season 22</option>
+                            <option value="22">Season 22</option>
                         </select>
                     </div>
                     <div class="space-y-2">
@@ -567,7 +627,7 @@
 
         let matches = [], playerRanks = {}, tickets = [], animes = [];
         let openPlayerDetails = new Set(); 
-        let currentSeason = 22, currentViewMode = 'Alle', currentMatchType = 'Rangliste', currentResult = 'Win';
+        let currentSeason = 21, currentViewMode = 'Alle', currentMatchType = 'Rangliste', currentResult = 'Win';
         let currentAnimeTab = 'Gesamt';
         
         const knownPlayers = ["Pudelmuetze", "Nora", "Philipp", "Simon", "Noobie", "Christoph"];
@@ -606,11 +666,10 @@
         const ranksStadium = [{ name: "Rookie", emoji: "🥉" }, { name: "Novice", emoji: "🥈" }, { name: "Contender", emoji: "🛡️" }, { name: "Elite", emoji: "💎" }, { name: "Pro", emoji: "🏆" }, { name: "All-Star", emoji: "⚡" }, { name: "Legend", emoji: "👑" }];
 
         const animeGenresList = [
-            "Shōnen", "Shōjo", "Seinen", "Josei", 
-            "Action", "Abenteuer", "Comedy", "Drama", "Ecchi", "Fantasy", "Harem", 
-            "Historisch", "Horror", "Isekai", "Mecha", "Musik", "Mystery", 
-            "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports", "Thriller",
-            "Supernatural", "School"
+            "Abenteuer", "Action", "Comedy", "Drama", "Ecchi", "Fantasy", "Harem", 
+            "Historisch", "Horror", "Isekai", "Josei", "Mecha", "Musik", "Mystery", 
+            "Psychological", "Romance", "School", "Sci-Fi", "Seinen", "Shōjo", "Shōnen", 
+            "Slice of Life", "Sports", "Supernatural", "Thriller"
         ];
         let selectedAnimeGenres = [];
 
@@ -1101,9 +1160,8 @@
         window.calcAnimeRank = function() {
             const getVal = (id) => {
                 const el = document.getElementById(id);
-                let val = parseInt(el ? el.value : 0) || 0;
-                if(val < 1) val = 1; if(val > 10) val = 10;
-                if(el) el.value = val; 
+                let val = parseInt(el ? el.value : 0);
+                if (isNaN(val)) val = 0;
                 return val;
             };
             
@@ -1121,6 +1179,13 @@
                 rankEl.className = `text-2xl sm:text-3xl font-black px-4 sm:px-5 py-1.5 sm:py-2 rounded-xl border shadow-lg rank-${formatRating(rank)}`;
             }
             return { total, rank };
+        };
+
+        window.enforceBounds = function(el) {
+            let val = parseInt(el.value);
+            if (isNaN(val) || val < 1) el.value = 1;
+            if (val > 10) el.value = 10;
+            window.calcAnimeRank();
         };
 
         window.saveAnime = function() {
@@ -1234,7 +1299,7 @@
                         <td class="py-3 sm:py-4 px-2 sm:px-4 min-w-[200px]">
                             <div class="text-[11px] sm:text-sm font-black text-white italic tracking-tight mb-1 sm:mb-1.5"><span class="text-slate-500 mr-1">#${i+1}</span> ${a.title}</div>
                             <div class="flex flex-wrap gap-1 mb-1 sm:mb-2">${badges}</div>
-                            <div class="text-[8px] sm:text-[9px] text-slate-500 mt-1.5 sm:mt-2 font-bold uppercase tracking-widest">Gesehen von: ${a.raters}</div>
+                            <div class="text-[8px] sm:text-[9px] text-slate-500 mt-1.5 sm:mt-2 font-bold uppercase tracking-widest truncate max-w-[250px] sm:max-w-md">Gesehen von: ${a.raters}</div>
                         </td>
                         <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
                             <span class="text-[10px] sm:text-xs font-black text-slate-300 bg-black/20 px-1.5 sm:px-2 py-1 rounded-md border border-slate-700">${a.score}/100 Ø</span>
@@ -1242,7 +1307,7 @@
                         <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
                             <span class="text-[10px] sm:text-xs font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border rank-${formatRating(a.rank)}">${a.rank}</span>
                         </td>
-                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-right align-middle">
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-right align-middle whitespace-nowrap">
                             <span class="text-[8px] sm:text-[9px] font-black text-slate-500 bg-black/20 px-1.5 sm:px-2 py-1 rounded-lg">${a.count} Votes</span>
                         </td>
                     </tr>
@@ -1266,7 +1331,7 @@
                         <td class="py-3 sm:py-4 px-2 sm:px-4 min-w-[200px]">
                             <div class="text-[11px] sm:text-sm font-black text-white italic tracking-tight mb-1 sm:mb-1.5">${a.title}</div>
                             <div class="flex flex-wrap gap-1 mb-1 sm:mb-2">${badges}</div>
-                            ${a.comment ? `<div class="text-[9px] sm:text-[10px] text-slate-400 italic line-clamp-2 max-w-md">"${a.comment}"</div>` : ''}
+                            ${a.comment ? `<div class="text-[9px] sm:text-[10px] text-slate-400 italic line-clamp-2 max-w-[250px] sm:max-w-md">"${a.comment}"</div>` : ''}
                             <div class="text-[8px] sm:text-[9px] text-slate-600 mt-1.5 sm:mt-2 font-bold uppercase tracking-widest">${a.date}</div>
                         </td>
                         <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
@@ -1275,7 +1340,7 @@
                         <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
                             <span class="text-[10px] sm:text-xs font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border rank-${formatRating(a.rating)}">${a.rating}</span>
                         </td>
-                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-right align-middle">
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-right align-middle whitespace-nowrap">
                             <button onclick="window.deleteAnime(${a.id})" class="opacity-0 group-hover:opacity-100 text-red-500/60 hover:text-red-500 hover:bg-red-500/10 p-1.5 sm:p-2 rounded-lg transition-all">🗑️</button>
                         </td>
                     </tr>
@@ -1505,7 +1570,7 @@
     </script>
 
     <div class="fixed bottom-4 right-4 sm:right-6 text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest z-50 bg-[#0f172a]/80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg backdrop-blur-sm border border-white/5 pointer-events-none">
-        v.1.26.00
+        v.1.28.00
     </div>
 </body>
 </html>
