@@ -139,7 +139,6 @@
                     <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Globale Performance</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="window.exportData()" class="text-[10px] bg-white/5 hover:bg-orange-500/20 px-3 py-2 rounded-lg border border-white/5 uppercase font-bold tracking-widest transition-all">💾 Export</button>
                     <button onclick="document.getElementById('importFile').click()" class="text-[10px] bg-white/5 hover:bg-blue-500/20 px-3 py-2 rounded-lg border border-white/5 uppercase font-bold tracking-widest transition-all">📂 Import</button>
                     <input type="file" id="importFile" class="hidden" accept=".json" onchange="window.importData(event)">
                 </div>
@@ -281,12 +280,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // =========================================================================
-        // FIREBASE SETUP MIT DEINEN DATEN
-        // =========================================================================
+        // Firebase Config
         const myFirebaseConfig = {
             apiKey: "AIzaSyAtMaZsMBp6NYbbDb08-hOon8Wj6ICAGsg",
             authDomain: "owtracker-75c7e.firebaseapp.com",
@@ -296,31 +293,18 @@
             appId: "1:692573463552:web:1add4b2b07ca345471e4e5",
             measurementId: "G-5JM5J8MGDM"
         };
-        const appId = 'ow2-tracker-data'; // Spezifischer DB Name
-        // =========================================================================
+        const appId = 'ow2-tracker-data';
 
-        let app, auth, db;
+        let app, auth, db, currentUser = null;
         try {
             app = initializeApp(myFirebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-        } catch(e) {
-            console.warn("Firebase konnte nicht geladen werden.", e);
-        }
-        
-        let currentUser = null;
+        } catch(e) { console.warn("Firebase Init Error", e); }
 
+        // State
         let matches = [];
         let playerRanks = {};
-        try {
-            matches = JSON.parse(localStorage.getItem('ow_stats_v2') || '[]');
-            if(!Array.isArray(matches)) matches = [];
-            playerRanks = JSON.parse(localStorage.getItem('ow_player_ranks') || '{}');
-            if(typeof playerRanks !== 'object' || playerRanks === null) playerRanks = {};
-        } catch(e) {
-            matches = []; playerRanks = {};
-        }
-        
         let currentSeason = 21;
         let currentViewMode = 'Alle';
         let currentMatchType = 'Rangliste';
@@ -373,34 +357,27 @@
                         select.nextElementSibling.remove();
                     }
                     select.style.display = 'none';
-                    
                     const container = document.createElement('div');
                     const isFlex1 = select.classList.contains('flex-1');
                     const isMinW0 = select.classList.contains('min-w-0');
                     const isWFull = select.classList.contains('w-full');
-                    
                     container.className = 'relative custom-select-container ' + (isFlex1 ? 'flex-1 ' : '') + (isWFull ? 'w-full ' : '') + (isMinW0 ? 'min-w-0' : '');
                     container.tabIndex = 0;
-                    
                     const trigger = document.createElement('div');
                     let triggerClass = select.className.replace('custom-select', '').replace('flex-1', '').replace('min-w-0', '').replace('w-full', '');
                     trigger.className = triggerClass + ' flex justify-between items-center cursor-pointer select-none';
                     trigger.style.backgroundImage = 'none';
                     trigger.style.paddingRight = '1rem';
-                    
                     const isRight = select.classList.contains('text-right');
                     const selectedOpt = select.options[select.selectedIndex];
                     trigger.innerHTML = `<span class="truncate ${isRight ? 'w-full text-right' : ''} pr-2">${selectedOpt ? selectedOpt.text : ''}</span><span class="text-slate-500 text-[10px] shrink-0">▼</span>`;
-                    
                     const dropdown = document.createElement('div');
                     dropdown.className = 'absolute left-0 top-[calc(100%+8px)] w-full min-w-[12rem] bg-[#161a2b] border border-white/10 rounded-xl shadow-2xl opacity-0 invisible transition-all z-[100] max-h-64 overflow-y-auto custom-scrollbar';
                     if (isRight) { dropdown.classList.replace('left-0', 'right-0'); }
-
                     container.addEventListener('blur', () => {
                         dropdown.classList.remove('opacity-100', 'visible');
                         dropdown.classList.add('opacity-0', 'invisible');
                     });
-                    
                     trigger.addEventListener('click', () => {
                         const isOpen = dropdown.classList.contains('visible');
                         document.querySelectorAll('.custom-select-container > div:last-child').forEach(d => {
@@ -413,13 +390,11 @@
                             container.focus();
                         }
                     });
-
                     const createItem = (opt, index) => {
                         const item = document.createElement('div');
                         item.className = 'px-4 py-3 text-xs text-slate-300 hover:bg-white/10 cursor-pointer transition-colors break-words whitespace-normal';
                         if (opt.selected) item.classList.add('text-orange-400', 'bg-white/5', 'font-bold');
                         item.innerHTML = opt.text;
-                        
                         item.addEventListener('mousedown', (e) => e.preventDefault());
                         item.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -427,48 +402,45 @@
                             trigger.querySelector('span.truncate').innerHTML = opt.text;
                             dropdown.classList.remove('opacity-100', 'visible');
                             dropdown.classList.add('opacity-0', 'invisible');
-                            
                             select.dispatchEvent(new Event('change', { bubbles: true }));
-                            
                             Array.from(dropdown.querySelectorAll('div.cursor-pointer')).forEach(c => c.classList.remove('text-orange-400', 'bg-white/5', 'font-bold'));
                             item.classList.add('text-orange-400', 'bg-white/5', 'font-bold');
                         });
                         dropdown.appendChild(item);
                     };
-
-                    let optIndex = 0;
                     Array.from(select.children).forEach(child => {
                         if (child.tagName === 'OPTGROUP') {
                             const groupLabel = document.createElement('div');
                             groupLabel.className = 'px-4 py-2 text-[9px] font-black text-slate-500 uppercase tracking-widest bg-[#0b0e17] sticky top-0 z-10 border-y border-white/5 first:border-t-0';
                             groupLabel.innerText = child.label;
                             dropdown.appendChild(groupLabel);
-                            
                             const options = child.querySelectorAll('option');
-                            Array.from(options).forEach(opt => { createItem(opt, optIndex++); });
+                            Array.from(options).forEach(opt => {
+                                let localIdx = 0;
+                                for(let i=0; i<select.options.length; i++) if(select.options[i] === opt) localIdx = i;
+                                createItem(opt, localIdx);
+                            });
                         } else if (child.tagName === 'OPTION') {
-                            createItem(child, optIndex++);
+                            let localIdx = 0;
+                            for(let i=0; i<select.options.length; i++) if(select.options[i] === child) localIdx = i;
+                            createItem(child, localIdx);
                         }
                     });
-                    
                     container.appendChild(trigger);
                     container.appendChild(dropdown);
                     select.parentNode.insertBefore(container, select.nextSibling);
                 });
             } catch(e) { console.error("Dropdown Build Error", e); }
         }
-        // =======================================================
 
         function setCloudStatus(status, type) {
             const statusContainer = document.getElementById('cloudStatusContainer');
             const statusEl = document.getElementById('cloudStatus');
             const dotEl = document.getElementById('cloudStatusDot');
             if(!statusEl) return;
-
             statusEl.innerText = status;
             statusContainer.className = 'hidden md:flex items-center gap-2 px-3 py-1 rounded-full border';
             dotEl.className = 'w-1.5 h-1.5 rounded-full';
-
             if(type === 'success') {
                 statusContainer.classList.add('bg-green-500/10', 'border-green-500/20');
                 dotEl.classList.add('bg-green-500', 'animate-pulse');
@@ -484,66 +456,38 @@
             }
         }
 
-        const initAuth = async () => {
-            if (!auth) {
-                setCloudStatus('Lokaler Modus', 'warn');
-                return;
-            }
-            try {
-                await signInAnonymously(auth);
-            } catch (err) {
-                console.error("Auth Error", err);
-                setCloudStatus('Auth Error (Rules?)', 'error');
-            }
-        };
-
         function setupCloudListeners() {
             if (!db) return;
             setCloudStatus('Verbinde...', 'warn');
             
+            // Matches Sync - Source of Truth: Cloud Snapshot
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), (snapshot) => {
                 setCloudStatus('Cloud Sync Active', 'success');
-                const serverMatches = snapshot.docs.map(d => d.data());
-                
-                // Merge
-                const merged = [...matches, ...serverMatches];
-                const unique = Array.from(new Map(merged.map(item => [item.id, item])).values());
-                unique.sort((a, b) => (b.id || 0) - (a.id || 0));
-                
-                matches = unique;
+                // Wir überschreiben die lokale Liste mit dem Server-Stand, damit Löschungen synchronisiert werden
+                matches = snapshot.docs.map(d => d.data());
+                matches.sort((a, b) => (b.id || 0) - (a.id || 0));
                 localStorage.setItem('ow_stats_v2', JSON.stringify(matches));
                 refreshCurrentPage();
             }, (error) => {
                 console.error("Firebase Sync Fehler:", error);
-                setCloudStatus('DB Regeln fehlen!', 'error');
-                showBanner("Cloud blockiert (Firestore Rules prüfen!)", "error");
+                setCloudStatus('DB Regeln prüfen!', 'error');
             });
 
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks'), (docSnap) => {
                 if (docSnap.exists()) {
-                    playerRanks = { ...playerRanks, ...docSnap.data() };
+                    playerRanks = docSnap.data();
                     localStorage.setItem('ow_player_ranks', JSON.stringify(playerRanks));
                 }
                 if (!document.getElementById('page-players').classList.contains('hidden')) {
                     window.updatePlayerDashboards();
                 }
-            }, (error) => console.error("Cloud Ranks Error", error));
+            });
         }
 
         function refreshCurrentPage() {
             if (!document.getElementById('page-dashboard').classList.contains('hidden')) window.updateDashboard();
             if (!document.getElementById('page-players').classList.contains('hidden')) window.updatePlayerDashboards();
             if (!document.getElementById('page-entry').classList.contains('hidden')) window.updateRecentMatches();
-        }
-
-        window.exportData = function() {
-            try {
-                const data = { matches, playerRanks };
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = `ow_backup.json`; a.click();
-            } catch(e) { showBanner("Export fehlgeschlagen", "error"); }
         }
 
         window.importData = function(event) {
@@ -554,21 +498,12 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if(data.matches) {
-                        matches = data.matches;
-                        localStorage.setItem('ow_stats_v2', JSON.stringify(matches));
-                        if(currentUser && db) {
-                            data.matches.forEach(m => setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), m.id.toString()), m));
-                        }
+                        data.matches.forEach(m => setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), m.id.toString()), m));
                     }
                     if(data.playerRanks) {
-                        playerRanks = data.playerRanks;
-                        localStorage.setItem('ow_player_ranks', JSON.stringify(playerRanks));
-                        if(currentUser && db) {
-                            setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks'), data.playerRanks);
-                        }
+                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks'), data.playerRanks);
                     }
-                    showBanner("Daten importiert!", "success");
-                    location.reload();
+                    showBanner("Import erfolgreich!", "success");
                 } catch (err) { showBanner("Import fehlgeschlagen!", "error"); }
             };
             reader.readAsText(file);
@@ -579,47 +514,35 @@
             document.querySelectorAll('.season-tab').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`season-${s}`).classList.add('active');
             document.querySelectorAll('.active-season-label').forEach(l => l.innerText = `S${s}`);
-            const activePage = Array.from(document.querySelectorAll('.page')).find(p => !p.classList.contains('hidden'));
-            window.showPage(activePage.id.replace('page-', ''));
+            refreshCurrentPage();
         }
 
         window.setViewMode = function(mode) {
             currentViewMode = mode;
-            const modes = ['Alle', 'Rangliste', 'Stadion'];
-            const ids = ['viewModeAlle', 'viewModeRanked', 'viewModeStadium'];
-            
-            modes.forEach((m, i) => {
-                const btn = document.getElementById(ids[i]);
+            ['Alle', 'Rangliste', 'Stadion'].forEach(m => {
+                const btn = document.getElementById('viewMode' + (m==='Alle'?'Alle':m==='Rangliste'?'Ranked':'Stadium'));
                 if (m === mode) {
                     btn.className = 'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all bg-orange-500/10 text-orange-500 border-orange-500/20';
                 } else {
                     btn.className = 'px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all hover:bg-white/5 text-slate-500';
                 }
             });
-            
             const label = document.getElementById('active-mode-label');
             if (label) label.innerText = mode === 'Alle' ? 'Alle Modi' : mode;
-            
             refreshCurrentPage();
         }
 
         window.showPage = function(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById(`page-${id}`).classList.remove('hidden');
-            if (id === 'dashboard') window.updateDashboard();
-            if (id === 'players') window.updatePlayerDashboards();
-            if (id === 'entry') window.updateRecentMatches();
+            refreshCurrentPage();
         }
 
         window.setMatchType = function(type) {
             currentMatchType = type;
             document.getElementById('typeRanked').classList.toggle('active', type === 'Rangliste');
             document.getElementById('typeStadium').classList.toggle('active', type === 'Stadion');
-            
-            const pCont = document.getElementById('punkteContainer');
-            if(type === 'Stadion') pCont.classList.remove('hidden');
-            else pCont.classList.add('hidden');
-
+            document.getElementById('punkteContainer').classList.toggle('hidden', type !== 'Stadion');
             window.updateRankOptions();
             window.updateMapOptions();
         }
@@ -629,10 +552,8 @@
             const endSelect = document.getElementById('matchRankEnd');
             startSelect.innerHTML = '<option value="-">-</option>';
             endSelect.innerHTML = '<option value="-">-</option>';
-            
             const list = currentMatchType === 'Rangliste' ? ranksRanked : ranksStadium;
             const pref = currentMatchType === 'Rangliste' ? 'icon' : 'emoji';
-
             list.forEach(r => {
                 for (let i = 5; i >= 1; i--) {
                     const optVal = `${r[pref]} ${r.name} ${i}`;
@@ -646,10 +567,7 @@
         window.updateMapOptions = function(skipInit = false) {
             const mapSelect = document.getElementById('matchMap');
             mapSelect.innerHTML = '<option value="">Keine Karte</option>';
-            
-            const mode = currentMatchType === 'Rangliste' ? 'ranked' : 'stadium';
-            const categories = mapsByType[mode];
-
+            const categories = mapsByType[currentMatchType === 'Rangliste' ? 'ranked' : 'stadium'];
             for (const [cat, maps] of Object.entries(categories)) {
                 const group = document.createElement('optgroup');
                 group.label = cat;
@@ -670,13 +588,10 @@
         }
 
         window.updateHeroSelect = function(roleSelect) {
-            const row = roleSelect.parentElement;
-            const role = roleSelect.value;
-            const heroSelect = row.querySelectorAll('select')[2];
-            
+            const heroSelect = roleSelect.parentElement.querySelectorAll('select')[2];
             heroSelect.innerHTML = '<option value="">Keiner</option>';
-            if (heroesByRole[role]) {
-                heroesByRole[role].forEach(h => {
+            if (heroesByRole[roleSelect.value]) {
+                heroesByRole[roleSelect.value].forEach(h => {
                     const opt = document.createElement('option');
                     opt.value = h; opt.textContent = h;
                     heroSelect.appendChild(opt);
@@ -692,7 +607,6 @@
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center animate-in";
             const defaultRole = index >= 3 ? 'support' : (index === 0 ? 'tank' : 'dps');
-
             div.innerHTML = `
                 <div class="grid grid-cols-3 gap-2 flex-1">
                     <select class="custom-select p-3 bg-[#0b0e17] border border-white/5 rounded-xl text-xs outline-none font-bold">
@@ -716,99 +630,64 @@
 
         window.updateAddButtonState = function() {
             const btn = document.getElementById('btnAddPlayer');
+            if(!btn) return;
             const full = document.getElementById('matchPlayersList').children.length >= 5;
             btn.disabled = full; btn.classList.toggle('opacity-30', full);
         }
 
         window.saveMatch = function() {
-            try {
-                const players = [];
-                const rows = document.getElementById('matchPlayersList').children;
-                const names = new Set();
-                
-                for (let row of rows) {
-                    const selects = row.querySelectorAll('select');
-                    const n = selects[0].value;
-                    if (names.has(n)) { showBanner("Spieler doppelt!", "error"); return; }
-                    names.add(n);
-                    players.push({ name: n, role: selects[1].value, hero: selects[2].value });
-                }
-                if (!players.length) return;
-
-                const rStart = document.getElementById('matchRankStart').value;
-                const rEnd = document.getElementById('matchRankEnd').value;
-                const combinedRank = (rStart !== '-' && rEnd !== '-') ? `${rStart} - ${rEnd.split(' ').pop()}` : (rStart !== '-' ? rStart : '-');
-
-                const match = {
-                    id: Date.now(),
-                    season: parseInt(document.getElementById('matchSeason').value),
-                    type: currentMatchType,
-                    result: currentResult,
-                    rank: combinedRank,
-                    map: document.getElementById('matchMap').value,
-                    score: document.getElementById('matchScore').value,
-                    leaver: document.getElementById('matchLeaver').checked,
-                    players,
-                    date: new Date().toLocaleDateString('de-DE'),
-                    time: new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
-                };
-
-                matches.unshift(match);
-                matches = Array.from(new Map(matches.map(item => [item.id, item])).values());
-                matches.sort((a, b) => (b.id || 0) - (a.id || 0));
-                localStorage.setItem('ow_stats_v2', JSON.stringify(matches));
-                
-                if (currentUser && db) {
-                    const docRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), match.id.toString());
-                    setDoc(docRef, match).then(() => {
-                        showBanner("In der Cloud gespeichert!", "success");
-                    }).catch(e => {
-                        console.error("Speicher-Fehler:", e);
-                        showBanner("Cloud-Fehler: " + e.message, "error");
-                    });
-                } else {
-                    showBanner("Lokal gespeichert!", "success");
-                }
-
-                document.getElementById('matchScore').value = '';
-                document.getElementById('matchLeaver').checked = false;
-                
-                window.updateRecentMatches();
-                if (!document.getElementById('page-dashboard').classList.contains('hidden')) window.updateDashboard();
-                if (!document.getElementById('page-players').classList.contains('hidden')) window.updatePlayerDashboards();
-            } catch(e) {
-                console.error("Save Match Error:", e);
-                showBanner("Fehler beim Speichern", "error");
+            const players = [];
+            const rows = document.getElementById('matchPlayersList').children;
+            const names = new Set();
+            for (let row of rows) {
+                const selects = row.querySelectorAll('select');
+                if (names.has(selects[0].value)) { showBanner("Spieler doppelt!", "error"); return; }
+                names.add(selects[0].value);
+                players.push({ name: selects[0].value, role: selects[1].value, hero: selects[2].value });
             }
+            if (!players.length) return;
+            const rStart = document.getElementById('matchRankStart').value;
+            const rEnd = document.getElementById('matchRankEnd').value;
+            const match = {
+                id: Date.now(),
+                season: parseInt(document.getElementById('matchSeason').value),
+                type: currentMatchType,
+                result: currentResult,
+                rank: (rStart !== '-' && rEnd !== '-') ? `${rStart} - ${rEnd.split(' ').pop()}` : (rStart !== '-' ? rStart : '-'),
+                map: document.getElementById('matchMap').value,
+                score: document.getElementById('matchScore').value,
+                leaver: document.getElementById('matchLeaver').checked,
+                players,
+                date: new Date().toLocaleDateString('de-DE'),
+                time: new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+            };
+            if (currentUser && db) {
+                setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), match.id.toString()), match)
+                    .then(() => showBanner("Gespeichert!", "success"))
+                    .catch(e => showBanner("Cloud-Fehler", "error"));
+            }
+            document.getElementById('matchScore').value = '';
+            document.getElementById('matchLeaver').checked = false;
         }
 
         window.savePlayerRank = function(pName, category, role, value) {
-            try {
-                if (!playerRanks[pName]) playerRanks[pName] = {};
-                playerRanks[pName][`${role}_${category}`] = value;
-                localStorage.setItem('ow_player_ranks', JSON.stringify(playerRanks));
-                
-                if (currentUser && db) {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks');
-                    setDoc(docRef, playerRanks, { merge: true }).catch(e => console.error(e));
-                }
-            } catch(e) { console.error("Save Rank Error", e); }
+            if (!playerRanks[pName]) playerRanks[pName] = {};
+            playerRanks[pName][`${role}_${category}`] = value;
+            if (currentUser && db) {
+                setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ranks', 'allRanks'), playerRanks, { merge: true });
+            }
         }
 
         window.updateDashboard = function() {
             try {
                 const filtered = matches.filter(m => m.season === currentSeason && (currentViewMode === 'Alle' || m.type === currentViewMode));
-                const total = filtered.length;
-                const wins = filtered.filter(m => m.result === 'Win').length;
-                const leavers = filtered.filter(m => m.leaver).length;
-                
+                const total = filtered.length, wins = filtered.filter(m => m.result === 'Win').length, leavers = filtered.filter(m => m.leaver).length;
                 document.getElementById('globalWinrate').innerText = total > 0 ? Math.round((wins / total) * 100) + "%" : "0%";
                 document.getElementById('globalMatches').innerText = total;
                 document.getElementById('globalWins').innerText = wins;
                 document.getElementById('globalLosses').innerText = total - wins;
                 document.getElementById('globalLeavers').innerText = leavers;
                 document.getElementById('globalLeaverPerc').innerText = total > 0 ? Math.round((leavers / total) * 100) + "%" : "0%";
-
                 let curW = 0, curL = 0, maxW = 0, maxL = 0;
                 [...filtered].reverse().forEach(m => {
                     if (m.result === 'Win') { curW++; curL = 0; if (curW > maxW) maxW = curW; }
@@ -816,16 +695,13 @@
                 });
                 document.getElementById('maxWinStreak').innerText = maxW;
                 document.getElementById('maxLossStreak').innerText = maxL;
-                
                 const combos = {};
                 filtered.forEach(m => {
-                    if (!m || !Array.isArray(m.players) || m.players.length < 2) return;
+                    if (!m.players) return;
                     for (let i = 0; i < m.players.length; i++) {
                         for (let j = i + 1; j < m.players.length; j++) {
-                            const p1 = m.players[i], p2 = m.players[j];
-                            if(!p1 || !p2) continue;
-                            const key = [p1.name, p2.name].sort().join(' · ');
-                            if (!combos[key]) combos[key] = { wins: 0, total: 0, p1, p2 };
+                            const key = [m.players[i].name, m.players[j].name].sort().join(' · ');
+                            if (!combos[key]) combos[key] = { wins: 0, total: 0 };
                             combos[key].total++; if (m.result === 'Win') combos[key].wins++;
                         }
                     }
@@ -834,191 +710,81 @@
                 const renderC = (name, s) => `<div class="glass-card p-4 flex justify-between items-center bg-white/[0.01]"><div><p class="text-xs font-black text-orange-500 uppercase tracking-widest leading-none mb-1">${Math.round((s.wins/s.total)*100)}% Winrate</p><p class="text-[11px] font-bold text-slate-400">${name}</p></div><p class="text-[10px] font-black text-slate-600 bg-black/40 px-2 py-1 rounded-md italic">${s.total} Matches</p></div>`;
                 document.getElementById('bestCombos').innerHTML = sorted.slice(0, 3).map(([n,s]) => renderC(n,s)).join('');
                 document.getElementById('worstCombos').innerHTML = [...sorted].reverse().slice(0, 3).map(([n,s]) => renderC(n,s)).join('');
-            } catch(e) { console.error("Dashboard Render Error", e); }
+            } catch(e) { console.error("Dashboard Error", e); }
         }
 
         window.updatePlayerDashboards = function() {
             try {
                 const grid = document.getElementById('playersGrid'); grid.innerHTML = "";
-                const seasonMatches = matches.filter(m => m && m.season === currentSeason && Array.isArray(m.players) && (currentViewMode === 'Alle' || m.type === currentViewMode));
-
+                const seasonMatches = matches.filter(m => m.season === currentSeason && (currentViewMode === 'Alle' || m.type === currentViewMode));
                 knownPlayers.forEach(pName => {
-                    const pMatches = seasonMatches.filter(m => m.players.some(p => p && p.name === pName));
+                    const pMatches = seasonMatches.filter(m => m.players.some(p => p.name === pName));
                     const total = pMatches.length, wins = pMatches.filter(m => m.result === 'Win').length, losses = total - wins;
-                    const winLeavers = pMatches.filter(m => m.leaver && m.result === 'Win').length;
-                    const lossLeavers = pMatches.filter(m => m.leaver && m.result === 'Lose').length;
-                    
                     const ranks = playerRanks[pName] || {};
-
-                    const createSelects = (cat) => {
+                    const createSelects = (cat) => ['tank', 'dps', 'support'].map(r => {
+                        const val = ranks[`${r}_${cat}`] || '-';
                         const list = cat === 'ranked' ? ranksRanked : ranksStadium;
                         const pref = cat === 'ranked' ? 'icon' : 'emoji';
-                        return ['tank', 'dps', 'support'].map(r => {
-                            const val = ranks[`${r}_${cat}`] || '-';
-                            const rData = roles[r] || { color: '', icon: '', name: r };
-                            return `
-                            <div class="flex items-center justify-between mb-1.5 bg-[#161a2b] border border-white/5 rounded-md px-1.5 py-1">
-                                <span class="text-[10px] font-bold flex items-center gap-1 text-slate-300 shrink-0 w-14">
-                                    <span class="${rData.color}">${rData.icon}</span> <span class="truncate">${rData.name}</span>
-                                </span>
-                                <select onchange="window.savePlayerRank('${pName}', '${cat}', '${r}', this.value)" class="custom-select flex-1 min-w-0 bg-transparent outline-none text-[10px] font-bold text-orange-500 text-right py-1 text-right">
-                                    <option value="-">-</option>
-                                    ${list.map(rr => {
-                                        let os = '';
-                                        for(let i=5; i>=1; i--) {
-                                            const v = `${rr[pref]} ${rr.name} ${i}`;
-                                            os += `<option value="${v}" ${val === v ? 'selected' : ''}>${v}</option>`;
-                                        }
-                                        return os;
-                                    }).join('')}
-                                </select>
-                            </div>`;
-                        }).join('');
-                    };
+                        return `
+                        <div class="flex items-center justify-between mb-1.5 bg-[#161a2b] border border-white/5 rounded-md px-1.5 py-1">
+                            <span class="text-[10px] font-bold flex items-center gap-1 text-slate-300 shrink-0 w-14">
+                                <span class="${roles[r].color}">${roles[r].icon}</span> <span class="truncate">${roles[r].name}</span>
+                            </span>
+                            <select onchange="window.savePlayerRank('${pName}', '${cat}', '${r}', this.value)" class="custom-select flex-1 min-w-0 bg-transparent outline-none text-[10px] font-bold text-orange-500 text-right py-1">
+                                <option value="-">-</option>
+                                ${list.map(rr => {
+                                    let os = '';
+                                    for(let i=5; i>=1; i--) {
+                                        const v = `${rr[pref]} ${rr.name} ${i}`;
+                                        os += `<option value="${v}" ${val === v ? 'selected' : ''}>${v}</option>`;
+                                    }
+                                    return os;
+                                }).join('')}
+                            </select>
+                        </div>`;
+                    }).join('');
 
-                    let roleStats = { tank: {w:0, t:0}, dps: {w:0, t:0}, support: {w:0, t:0} };
-                    let heroStats = {};
-                    
+                    let roleStats = { tank: {w:0, t:0}, dps: {w:0, t:0}, support: {w:0, t:0} }, heroStats = {};
                     pMatches.forEach(m => {
-                        let p = m.players.find(x => x && x.name === pName);
-                        if(!p || !p.role || !roleStats[p.role]) return; // SAFEGUARD
-
-                        roleStats[p.role].t++;
-                        if(m.result === 'Win') roleStats[p.role].w++;
-                        
-                        if(p.hero && p.hero !== "Keiner") {
-                            if(!heroStats[p.hero]) heroStats[p.hero] = {w:0, t:0, role: p.role};
-                            heroStats[p.hero].t++;
-                            if(m.result === 'Win') heroStats[p.hero].w++;
+                        let p = m.players.find(x => x.name === pName);
+                        if(p && roleStats[p.role]) {
+                            roleStats[p.role].t++; if(m.result === 'Win') roleStats[p.role].w++;
+                            if(p.hero && p.hero !== "Keiner") {
+                                if(!heroStats[p.hero]) heroStats[p.hero] = {w:0, t:0};
+                                heroStats[p.hero].t++; if(m.result === 'Win') heroStats[p.hero].w++;
+                            }
                         }
                     });
-
-                    let topRole = 'tank';
-                    if (Object.keys(roleStats).length > 0) {
-                        topRole = Object.keys(roleStats).reduce((a, b) => roleStats[a].t > roleStats[b].t ? a : b);
-                    }
-                    let topRoleCount = roleStats[topRole].t;
-
-                    let validHeroes = Object.entries(heroStats).filter(x => x[1].t >= 1);
-                    let sortedH = [...validHeroes].sort((a,b) => (b[1].w/b[1].t) - (a[1].w/a[1].t) || b[1].t - a[1].t);
-                    let topHero = sortedH.length > 0 ? sortedH[0] : null;
-                    let flopHero = [...validHeroes].sort((a,b) => (a[1].w/a[1].t) - (b[1].w/b[1].t) || b[1].t - a[1].t)[0];
-                    if(sortedH.length > 1 && topHero && flopHero && topHero[0] === flopHero[0]) {
-                        flopHero = sortedH[sortedH.length-1];
-                    }
-
-                    const tRoleData = roles[topRole] || { color: '', icon: '', name: topRole };
+                    const topHero = Object.entries(heroStats).sort((a,b) => (b[1].w/b[1].t) - (a[1].w/a[1].t))[0];
+                    const flopHero = Object.entries(heroStats).sort((a,b) => (a[1].w/a[1].t) - (b[1].w/b[1].t))[0];
 
                     const div = document.createElement('div');
                     div.className = "glass-card p-5 animate-in flex flex-col";
                     div.innerHTML = `
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-xl font-black text-white">${pName}</h2>
-                            <span class="text-[9px] text-slate-500 font-black uppercase tracking-widest bg-white/5 px-2 py-1 rounded-full border border-white/5">Alle Rollen</span>
-                        </div>
-
-                        <!-- Rankings Box -->
+                        <h2 class="text-xl font-black text-white mb-4">${pName}</h2>
                         <div class="border border-white/5 rounded-xl p-2 grid grid-cols-2 gap-2 mb-4 bg-black/20">
-                            <div class="min-w-0">
-                                <div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Rangliste</div>
-                                ${createSelects('ranked')}
-                            </div>
-                            <div class="min-w-0">
-                                <div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Stadion</div>
-                                ${createSelects('stadium')}
-                            </div>
+                            <div><div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Rangliste</div>${createSelects('ranked')}</div>
+                            <div><div class="text-[8px] text-slate-400 uppercase tracking-widest mb-1.5 font-bold px-1">Stadion</div>${createSelects('stadium')}</div>
                         </div>
-
-                        <!-- Summary Stats -->
                         <div class="grid grid-cols-2 gap-2 mb-2">
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3 flex flex-col justify-center">
-                                <div class="text-[10px] text-slate-400 mb-1 font-bold">Winrate</div>
-                                <div class="text-xl font-black text-[var(--text-yellow)]">${total > 0 ? Math.round((wins/total)*100) : 0}%</div>
-                            </div>
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3 flex flex-col justify-center">
-                                <div class="text-[10px] text-slate-400 mb-1 font-bold">Matches</div>
-                                <div class="text-xl font-black text-white">${total}</div>
-                            </div>
+                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Winrate</div><div class="text-xl font-black text-[var(--text-yellow)]">${total > 0 ? Math.round((wins/total)*100) : 0}%</div></div>
+                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Matches</div><div class="text-xl font-black text-white">${total}</div></div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-2 mb-4">
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3">
-                                <div class="text-[10px] text-slate-400 mb-1 font-bold">Wins</div>
-                                <div class="text-xl font-black text-[var(--text-yellow)] leading-none flex items-baseline gap-1.5">
-                                    ${wins} ${winLeavers > 0 ? `<span class="text-[8px] text-red-500 font-bold">(${winLeavers} Leaver)</span>` : ''}
-                                </div>
-                            </div>
-                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3">
-                                <div class="text-[10px] text-slate-400 mb-1 font-bold">Losses</div>
-                                <div class="text-xl font-black text-[var(--text-yellow)] leading-none flex items-baseline gap-1.5">
-                                    ${losses} ${lossLeavers > 0 ? `<span class="text-[8px] text-red-500 font-bold">(${lossLeavers} Leaver)</span>` : ''}
-                                </div>
-                            </div>
+                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Wins</div><div class="text-xl font-black text-green-400">${wins}</div></div>
+                            <div class="border border-white/5 bg-white/[0.02] rounded-xl p-3"><div class="text-[10px] text-slate-400 mb-1 font-bold">Losses</div><div class="text-xl font-black text-red-400">${losses}</div></div>
                         </div>
-
-                        <!-- Winrate je Rolle -->
-                        <div class="text-[9px] text-slate-500 uppercase tracking-widest font-black mb-2">Winrate je Rolle</div>
                         <div class="grid grid-cols-3 gap-2 mb-4">
-                            ${['tank', 'dps', 'support'].map(r => {
-                                const rr = roles[r] || { color: '', icon: '' };
-                                return `
-                                <div class="border border-white/5 bg-white/[0.02] rounded-xl flex flex-col items-center py-3">
-                                    <div class="text-sm mb-1 ${rr.color}">${rr.icon}</div>
-                                    <div class="text-sm font-black text-white">${roleStats[r].t > 0 ? Math.round((roleStats[r].w/roleStats[r].t)*100) : '-'}%</div>
-                                    <div class="text-[9px] text-slate-500 font-bold">${roleStats[r].t}</div>
-                                </div>`
-                            }).join('')}
+                            ${['tank', 'dps', 'support'].map(r => `<div class="border border-white/5 bg-white/[0.02] rounded-xl flex flex-col items-center py-3"><div class="text-sm mb-1 ${roles[r].color}">${roles[r].icon}</div><div class="text-sm font-black text-white">${roleStats[r].t > 0 ? Math.round((roleStats[r].w/roleStats[r].t)*100) : '-'}%</div></div>`).join('')}
                         </div>
-
-                        <!-- Tops / Flops -->
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase mb-2 flex items-center gap-1"><span class="text-yellow-500">🏆</span> Tops</p>
-                                <div class="flex justify-between items-center text-[10px] mb-1.5 border-b border-white/5 pb-1">
-                                    <span class="text-slate-500 font-bold">Rolle</span>
-                                    <span class="font-bold text-white"><span class="${tRoleData.color}">${tRoleData.icon} ${tRoleData.name}</span> <span class="text-slate-500 text-[8px]">${topRoleCount}x</span></span>
-                                </div>
-                                <div class="flex justify-between items-center text-[10px]">
-                                    <span class="text-slate-500 font-bold">Held</span>
-                                    <span class="font-bold text-white">${topHero ? topHero[0] : '-'} <span class="text-green-500 ml-1">${topHero ? Math.round((topHero[1].w/topHero[1].t)*100)+'%' : ''}</span></span>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-[9px] font-black text-slate-400 uppercase mb-2 flex items-center gap-1">📉 Flops</p>
-                                <div class="flex justify-between items-center text-[10px] mb-1.5 border-b border-white/5 pb-1">
-                                    <span class="text-slate-500 font-bold">Held</span>
-                                    <span class="font-bold text-white">${flopHero ? flopHero[0] : '-'} <span class="text-red-400 ml-1">${flopHero ? Math.round((flopHero[1].w/flopHero[1].t)*100)+'%' : ''}</span></span>
-                                </div>
-                                <div class="flex justify-between items-center text-[10px]">
-                                    <span class="text-slate-500 font-bold">Highscore</span>
-                                    <span class="font-bold text-white">-</span>
-                                </div>
-                            </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4 text-[10px]">
+                            <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">🏆 Top Held</p><p class="font-bold text-white">${topHero ? topHero[0] : '-'}</p></div>
+                            <div><p class="text-[9px] font-black text-slate-400 uppercase mb-2">📉 Flop Held</p><p class="font-bold text-white">${flopHero ? flopHero[0] : '-'}</p></div>
                         </div>
-
-                        <!-- Mini Table -->
                         <div class="mt-auto pt-2 border-t border-white/5">
-                            <table class="w-full text-[9px] text-slate-300 font-bold uppercase tracking-wider">
-                                <thead class="border-b border-white/10 text-slate-500">
-                                    <tr>
-                                        <th class="pb-2 text-left">Datum ↓</th>
-                                        <th class="pb-2 text-left">Win</th>
-                                        <th class="pb-2 text-left">Modus</th>
-                                        <th class="pb-2 text-right">Rolle</th>
-                                    </tr>
-                                </thead>
+                            <table class="w-full text-[9px] text-slate-300 font-bold uppercase">
                                 <tbody>
-                                    ${pMatches.slice(0, 6).map(m => {
-                                        const mp = m.players.find(p => p && p.name === pName);
-                                        const rIco = (mp && roles[mp.role]) ? roles[mp.role].icon : '';
-                                        return `
-                                        <tr class="border-b border-white/5 last:border-0">
-                                            <td class="py-2.5 opacity-60">${m.date.slice(0, 5)}.${m.date.slice(6,8)}</td>
-                                            <td class="py-2.5 ${m.result === 'Win' ? 'text-green-400' : 'text-red-400'}">${m.result}</td>
-                                            <td class="py-2.5 opacity-80">${m.type}</td>
-                                            <td class="py-2.5 text-right text-xs">${rIco}</td>
-                                        </tr>`
-                                    }).join('')}
+                                    ${pMatches.slice(0, 5).map(m => `<tr class="border-b border-white/5 last:border-0"><td class="py-2 opacity-60">${m.date.slice(0, 5)}</td><td class="py-2 ${m.result === 'Win' ? 'text-green-400' : 'text-red-400'}">${m.result}</td><td class="py-2 text-right">${roles[m.players.find(p => p.name === pName).role].icon}</td></tr>`).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -1026,81 +792,44 @@
                     grid.appendChild(div);
                 });
                 initCustomSelects(); 
-            } catch(e) { console.error("Render Players Error", e); }
-        }
-
-        window.deleteMatch = function(id) {
-            if (!confirm("Eintrag unwiderruflich löschen?")) return;
-            matches = matches.filter(m => m.id !== id);
-            localStorage.setItem('ow_stats_v2', JSON.stringify(matches));
-            
-            if (currentUser && db) {
-                const docRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), id.toString());
-                deleteDoc(docRef).catch(e => console.error("Cloud-Fehler beim Löschen"));
-            }
-            
-            window.updateRecentMatches(); 
-            window.updateDashboard();
+            } catch(e) { console.error("Player Render Error", e); }
         }
 
         window.updateRecentMatches = function() {
-            try {
-                const list = document.getElementById('recentMatchesList');
-                list.innerHTML = matches.slice(0, 15).map(m => `
-                    <div class="glass-card p-5 space-y-3 relative group animate-in hover:border-white/20 transition-all cursor-default">
-                        <button onclick="window.deleteMatch(${m.id})" class="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity text-red-500/40 hover:text-red-500 hover:scale-125">🗑️</button>
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <div class="text-[11px] font-black uppercase italic ${m.result === 'Win' ? 'text-green-500' : 'text-red-500'}">${m.result === 'Win' ? 'Victory' : 'Defeat'}</div>
-                                <div class="text-[9px] text-slate-500 font-black tracking-widest mt-1 uppercase">S${m.season} · ${m.type} · ${m.rank}</div>
-                            </div>
-                            ${m.score ? `<div class="text-[10px] font-black text-orange-500 bg-orange-500/10 px-2 py-1 rounded-lg">${m.score} Pkt</div>` : ''}
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            ${(m.players || []).map(p => {
-                                if(!p) return '';
-                                const ro = roles[p.role] || { color: '', icon: '' };
-                                return `<div class="bg-white/[0.03] border border-white/5 px-3 py-1.5 rounded-full text-[9px] font-black text-slate-300 uppercase tracking-tighter flex items-center gap-1"><span class="${ro.color} text-sm">${ro.icon}</span> ${p.name} <span class="text-slate-600 ml-1 italic">${p.hero !== 'Keiner' ? p.hero : ''}</span></div>`
-                            }).join('')}
-                        </div>
-                        <div class="text-[9px] text-slate-600 font-bold italic border-t border-white/5 pt-2 flex justify-between">
-                            <span>${m.date}, ${m.time}</span>
-                            <span>${m.map || 'Keine Map'}</span>
-                        </div>
-                    </div>`).join('');
-            } catch(e) { console.error("Recent Matches Render Error", e); }
+            const list = document.getElementById('recentMatchesList');
+            list.innerHTML = matches.slice(0, 15).map(m => `
+                <div class="glass-card p-5 space-y-3 relative group animate-in">
+                    <button onclick="window.deleteMatch(${m.id})" class="absolute right-4 top-4 opacity-0 group-hover:opacity-100 text-red-500/40 hover:text-red-500">🗑️</button>
+                    <div class="flex justify-between items-start">
+                        <div><div class="text-[11px] font-black uppercase italic ${m.result === 'Win' ? 'text-green-500' : 'text-red-500'}">${m.result === 'Win' ? 'Victory' : 'Defeat'}</div><div class="text-[9px] text-slate-500 font-black mt-1 uppercase">S${m.season} · ${m.type} · ${m.rank}</div></div>
+                        ${m.score ? `<div class="text-[10px] font-black text-orange-500 bg-orange-500/10 px-2 py-1 rounded-lg">${m.score}</div>` : ''}
+                    </div>
+                    <div class="flex flex-wrap gap-2">${(m.players || []).map(p => `<div class="bg-white/[0.03] border border-white/5 px-2 py-1 rounded-full text-[9px] font-black text-slate-300 uppercase flex items-center gap-1"><span>${roles[p.role].icon}</span> ${p.name} <span class="text-slate-600 italic">${p.hero !== 'Keiner' ? p.hero : ''}</span></div>`).join('')}</div>
+                    <div class="text-[9px] text-slate-600 font-bold border-t border-white/5 pt-2 flex justify-between"><span>${m.date}</span><span>${m.map || ''}</span></div>
+                </div>`).join('');
+        }
+
+        window.deleteMatch = function(id) {
+            if (!confirm("Eintrag unwiderruflich löschen?") || !currentUser) return;
+            deleteDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'matches'), id.toString())).then(() => showBanner("Gelöscht!", "success"));
         }
 
         function showBanner(text, type) {
             const banner = document.createElement('div');
-            banner.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-[2rem] text-xs font-black shadow-2xl z-[100] ${type === 'error' ? 'bg-red-600' : 'bg-green-600'} text-white border border-white/20 animate-in tracking-widest uppercase italic`;
+            banner.className = `fixed bottom-10 left-1/2 -translate-x-1/2 px-8 py-4 rounded-[2rem] text-xs font-black z-[100] ${type === 'error' ? 'bg-red-600' : 'bg-green-600'} text-white border border-white/20 animate-in tracking-widest uppercase italic shadow-2xl`;
             banner.innerText = text; document.body.appendChild(banner);
-            setTimeout(() => { banner.classList.add('animate-out', 'fade-out'); setTimeout(() => banner.remove(), 500); }, 3500);
+            setTimeout(() => banner.remove(), 3500);
         }
 
-        function initApp() {
-            window.updateRankOptions(true);
-            window.updateMapOptions(true);
-            window.addPlayerToMatch();
-            
-            if (auth) {
-                onAuthStateChanged(auth, (user) => {
-                    currentUser = user;
-                    if (user) setupCloudListeners();
-                });
-                initAuth();
-            } else {
-                setLocalModeUI();
-            }
-            window.showPage('entry'); // Startseite beim Laden direkt auf Eintragen 
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            initApp();
-        }
-
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) setupCloudListeners();
+        });
+        signInAnonymously(auth).catch(e => setCloudStatus('Auth Error', 'error'));
+        window.showPage('entry');
+        window.updateRankOptions(true);
+        window.updateMapOptions(true);
+        window.addPlayerToMatch();
     </script>
 </body>
 </html>
