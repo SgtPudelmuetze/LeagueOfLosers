@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+<!-- Version: 1.43.00 - Critical Bugfix: Restored accidentally deleted Anime JavaScript Logic (Slider calc, save, render list) -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -202,8 +203,10 @@
         </div>
     </div>
 
+    <!-- MAIN CONTAINER -->
     <main class="max-w-[1500px] mx-auto p-4 sm:p-8">
 
+        <!-- ==================== DASHBOARD PAGE ==================== -->
         <div id="page-dashboard" class="page space-y-6 sm:space-y-10 animate-in hidden">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -219,7 +222,9 @@
                 </div>
             </div>
 
+            <!-- Top Stats & Chart Row -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Quick Stats -->
                 <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                     <div class="bg-[#1e293b] rounded-2xl p-5 border border-slate-700/50 flex flex-col justify-center relative overflow-hidden group">
                         <div class="absolute right-0 top-0 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
@@ -248,6 +253,7 @@
                     </div>
                 </div>
 
+                <!-- Win/Loss Chart -->
                 <div class="glass-card p-6 flex flex-col items-center justify-center relative min-h-[250px]">
                     <h3 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 absolute top-6 left-6">Ratio</h3>
                     <div class="relative w-full max-w-[180px] sm:max-w-[200px] mx-auto mt-4">
@@ -260,6 +266,7 @@
                 </div>
             </div>
 
+            <!-- Top 10 Lists Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 pt-4">
                 <div class="glass-card flex flex-col overflow-hidden">
                     <div class="p-4 sm:p-5 border-b border-slate-700/50 flex items-center gap-3 bg-white/[0.02]">
@@ -295,10 +302,12 @@
             </div>
         </div>
 
+        <!-- ==================== PLAYERS PAGE ==================== -->
         <div id="page-players" class="page hidden animate-in">
              <div id="playersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"></div>
         </div>
 
+        <!-- ==================== ENTRY PAGE ==================== -->
         <div id="page-entry" class="page hidden grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 animate-in">
             <div class="md:col-span-2 glass-card p-6 sm:p-10 space-y-6 sm:space-y-8">
                 <h2 id="entryFormTitle" class="text-2xl font-black italic uppercase tracking-tighter transition-colors">Match Logbuch</h2>
@@ -374,6 +383,7 @@
             </div>
         </div>
 
+        <!-- ==================== ANIMES PAGE ==================== -->
         <div id="page-anime" class="page hidden flex flex-col gap-6 sm:gap-8 animate-in">
             <div class="glass-card p-6 sm:p-8 space-y-6 sm:space-y-8">
                 <div class="flex items-center gap-4 sm:gap-5">
@@ -387,6 +397,7 @@
                 </div>
                 
                 <div class="space-y-6 border-t border-slate-700 pt-6 sm:pt-8">
+                    <!-- Top Reihe: Titel, Bewerter, Genres -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="space-y-2 md:col-span-2">
                             <label class="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Titel des Animes</label>
@@ -399,10 +410,12 @@
                         <div class="space-y-2 md:col-span-3">
                             <label class="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Genres (Mehrfachauswahl)</label>
                             <div id="animeGenreContainer" class="flex flex-wrap gap-2 bg-[#1e293b] border border-white/10 p-3 sm:p-4 rounded-xl max-h-[140px] overflow-y-auto custom-scrollbar shadow-inner">
-                                </div>
+                                <!-- JS Injected Buttons (Checkboxes) -->
+                            </div>
                         </div>
                     </div>
                     
+                    <!-- Mitte: 10 Kategorien als Slider -->
                     <div class="space-y-4 pt-2">
                         <label class="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 block">Punktevergabe (1 - 10) über Slider</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -509,6 +522,7 @@
                         </div>
                     </div>
 
+                    <!-- Unten: Fazit & Ergebnis -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 pt-4">
                         <div class="md:col-span-2 space-y-2">
                             <label class="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Kurzes Fazit (Optional)</label>
@@ -530,6 +544,7 @@
                 </button>
             </div>
 
+            <!-- Anime Legende -->
             <div class="glass-card border-slate-700 overflow-hidden">
                 <div class="flex items-center justify-between cursor-pointer group bg-yellow-500/10 border-b border-yellow-500/30 p-4 sm:p-6 hover:bg-yellow-500/20 transition-all" onclick="document.getElementById('animeLegendContent').classList.toggle('hidden')">
                     <div class="flex items-center gap-3">
@@ -586,9 +601,10 @@
                 </div>
             </div>
             
+            <!-- Anime List -->
             <div class="glass-card p-6 sm:p-8 flex flex-col border border-slate-700">
                 <div class="flex gap-2 overflow-x-auto hide-scroll pb-3 mb-4 sm:mb-6 border-b border-slate-700" id="animeTabsContainer">
-                    </div>
+                </div>
 
                 <div class="flex items-center justify-between pb-4 mb-2 sm:mb-4">
                     <h2 class="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] italic text-slate-400" id="animeListTitle">Archiv</h2>
@@ -606,12 +622,13 @@
                             </tr>
                         </thead>
                         <tbody id="animesListBody">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        <!-- ==================== TICKETS PAGE ==================== -->
         <div id="page-tickets" class="page hidden grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 animate-in">
             <div class="md:col-span-2 glass-card p-6 sm:p-10 space-y-6 sm:space-y-8 h-fit">
                 <div class="flex items-center gap-4 sm:gap-5">
@@ -651,6 +668,7 @@
             </div>
         </div>
 
+        <!-- ==================== CHANGELOGS PAGE ==================== -->
         <div id="page-changelogs" class="page hidden animate-in max-w-4xl mx-auto">
             <div class="glass-card p-6 sm:p-10 space-y-8">
                 <div class="flex items-center gap-4 sm:gap-5">
@@ -663,7 +681,7 @@
                     </div>
                 </div>
                 <div id="changelogList" class="space-y-6 pt-4">
-                    </div>
+                </div>
             </div>
         </div>
 
@@ -698,8 +716,8 @@
         let openPlayerDetails = new Set(); 
         let currentSeason = 21, currentViewMode = 'Alle', currentMatchType = 'Rangliste', currentResult = 'Win';
         let currentAnimeTab = 'Gesamt';
+        let selectedAnimeGenres = [];
         
-        // Editing Logic State
         let editingMatchId = null;
         let editingMatchOriginalSeason = null;
         
@@ -744,9 +762,214 @@
             "Psychological", "Romance", "School", "Sci-Fi", "Seinen", "Shōjo", "Shōnen", 
             "Slice of Life", "Sports", "Supernatural", "Thriller"
         ];
-        let selectedAnimeGenres = [];
 
         function setSafeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
+
+        function getAnimeRankFromScore(total) {
+            if(total >= 98) return 'S+';
+            if(total >= 90) return 'S';
+            if(total >= 80) return 'A';
+            if(total >= 65) return 'B';
+            if(total >= 50) return 'C';
+            if(total >= 35) return 'D';
+            if(total >= 20) return 'E';
+            return 'F';
+        }
+
+        window.calcAnimeRank = function() {
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                let val = parseInt(el ? el.value : 0);
+                if (isNaN(val)) val = 0;
+                return val;
+            };
+            
+            const cats = ['animeStory', 'animeAnim', 'animeCast', 'animeDev', 'animeWorld', 'animePacing', 'animeSound', 'animeVoice', 'animeImpact', 'animeEnjoy'];
+            let total = 0;
+            for(let i=0; i<cats.length; i++) total += getVal(cats[i]);
+            
+            setSafeText('animeTotalScore', total);
+            const rank = getAnimeRankFromScore(total);
+            
+            const rankEl = document.getElementById('animeCalcRank');
+            if(rankEl) {
+                rankEl.innerText = rank;
+                const formatRating = (val) => val === 'S+' ? 'S-plus' : val;
+                rankEl.className = `text-2xl sm:text-3xl font-black px-4 py-2 rounded-xl border shadow-lg rank-${formatRating(rank)}`;
+            }
+            return { total, rank };
+        };
+
+        window.saveAnime = function() {
+            const titleEl = document.getElementById('animeTitle');
+            const reviewerEl = document.getElementById('animeReviewer');
+            const commentEl = document.getElementById('animeComment');
+            
+            if (!titleEl || !reviewerEl || !commentEl) return;
+            
+            const title = titleEl.value.trim();
+            const reviewer = reviewerEl.value;
+            const comment = commentEl.value.trim();
+            
+            if(!title) { showBanner("Bitte einen Titel eingeben!", "error"); return; }
+            if(selectedAnimeGenres.length === 0) { showBanner("Wähle mindestens ein Genre aus!", "error"); return; }
+
+            const { total, rank } = window.calcAnimeRank();
+
+            const anime = { 
+                id: Date.now(), 
+                title, 
+                genres: [...selectedAnimeGenres], 
+                reviewer, 
+                rating: rank, 
+                score: total, 
+                comment, 
+                date: new Date().toLocaleDateString('de-DE') 
+            };
+            
+            if(currentUser && db) {
+                const reviewerAnimes = animes.filter(a => a.reviewer === reviewer);
+                reviewerAnimes.push(anime);
+                reviewerAnimes.sort((a, b) => b.id - a.id);
+                
+                setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'anime_lists'), reviewer), { animes: reviewerAnimes }).then(() => {
+                    showBanner("Anime im Archiv gespeichert!", "success");
+                    titleEl.value = '';
+                    commentEl.value = '';
+                    selectedAnimeGenres = [];
+                    window.initAnimeGenresUI();
+                    
+                    const cats = ['animeStory', 'animeAnim', 'animeCast', 'animeDev', 'animeWorld', 'animePacing', 'animeSound', 'animeVoice', 'animeImpact', 'animeEnjoy'];
+                    for(let i=0; i<cats.length; i++) {
+                        const el = document.getElementById(cats[i]);
+                        if(el) {
+                            el.value = '5';
+                            window.updateSlider(cats[i]);
+                        }
+                    }
+                    window.calcAnimeRank();
+                });
+            }
+        }
+
+        window.deleteAnime = function(id) { 
+            if(confirm("Anime unwiderruflich löschen?") && currentUser && db) {
+                const animeToDelete = animes.find(a => a.id === id);
+                if(!animeToDelete) return;
+                const reviewer = animeToDelete.reviewer;
+                const newAnimes = animes.filter(a => a.reviewer === reviewer && a.id !== id);
+                setDoc(doc(collection(db, 'artifacts', appId, 'public', 'data', 'anime_lists'), reviewer), { animes: newAnimes });
+            }
+        }
+
+        window.updateAnimeList = function() {
+            const listBody = document.getElementById('animesListBody'); 
+            const listTitle = document.getElementById('animeListTitle');
+            const actionHead = document.getElementById('animeTableActionHead');
+            if(!listBody) return;
+            const formatRating = (val) => val === 'S+' ? 'S-plus' : val; 
+            
+            let html = '';
+            
+            if (currentAnimeTab === 'Gesamt') {
+                if(listTitle) listTitle.innerText = "Globale Tier-List";
+                if(actionHead) actionHead.innerText = "Infos";
+                
+                const agg = {};
+                for(let i=0; i<animes.length; i++) {
+                    const a = animes[i];
+                    const t = a.title.toLowerCase().trim();
+                    if(!agg[t]) agg[t] = { title: a.title, scoreSum: 0, count: 0, genres: {}, raters: {} };
+                    agg[t].scoreSum += a.score;
+                    agg[t].count++;
+                    
+                    if(a.genres && Array.isArray(a.genres)) {
+                        for(let g=0; g<a.genres.length; g++) agg[t].genres[a.genres[g]] = true;
+                    } else if (a.genre) {
+                        agg[t].genres[a.genre] = true;
+                    }
+                    if(a.reviewer) agg[t].raters[a.reviewer] = true;
+                }
+                
+                const aggregatedList = [];
+                for(const key in agg) {
+                    const g = agg[key];
+                    const avgScore = Math.round(g.scoreSum / g.count);
+                    const rank = getAnimeRankFromScore(avgScore);
+                    
+                    const genreArray = []; for(const gen in g.genres) genreArray.push(gen);
+                    const raterArray = []; for(const r in g.raters) raterArray.push(r);
+                    
+                    aggregatedList.push({
+                        title: g.title, score: avgScore, rank: rank,
+                        genres: genreArray,
+                        raters: raterArray.join(', '),
+                        count: g.count
+                    });
+                }
+                aggregatedList.sort((a, b) => b.score - a.score);
+                
+                setSafeText('animeCount', aggregatedList.length);
+                
+                html = aggregatedList.map((a, i) => {
+                    const badges = a.genres.length > 0 
+                        ? a.genres.map(g => `<span class="text-[7px] sm:text-[8px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-widest inline-block">${g}</span>`).join('')
+                        : `<span class="text-[7px] sm:text-[8px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-widest inline-block">Unbekannt</span>`;
+                        
+                    return `
+                    <tr class="border-b border-slate-700 hover:bg-white/[0.02] transition-colors">
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 min-w-[200px]">
+                            <div class="text-[11px] sm:text-sm font-black text-white italic tracking-tight mb-1 sm:mb-1.5"><span class="text-slate-500 mr-1">#${i+1}</span> ${a.title}</div>
+                            <div class="flex flex-wrap gap-1 mb-1 sm:mb-2">${badges}</div>
+                            <div class="text-[8px] sm:text-[9px] text-slate-500 mt-1.5 sm:mt-2 font-bold uppercase tracking-widest truncate max-w-[250px] sm:max-w-md">Gesehen von: ${a.raters}</div>
+                        </td>
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
+                            <span class="text-[10px] sm:text-xs font-black text-slate-300 bg-black/20 px-1.5 sm:px-2 py-1 rounded-md border border-slate-700">${a.score}/100 Ø</span>
+                        </td>
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
+                            <span class="text-[10px] sm:text-xs font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border rank-${formatRating(a.rank)}">${a.rank}</span>
+                        </td>
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-right align-middle whitespace-nowrap">
+                            <span class="text-[8px] sm:text-[9px] font-black text-slate-500 bg-black/20 px-1.5 sm:px-2 py-1 rounded-lg">${a.count} Votes</span>
+                        </td>
+                    </tr>
+                `}).join('');
+                
+            } else {
+                if(listTitle) listTitle.innerText = `Archiv: ${currentAnimeTab}`;
+                if(actionHead) actionHead.innerText = "Aktion";
+                
+                const filtered = animes.filter(a => a.reviewer === currentAnimeTab);
+                setSafeText('animeCount', filtered.length);
+                
+                html = filtered.map(a => {
+                    const gList = (a.genres && Array.isArray(a.genres)) ? a.genres : (a.genre ? [a.genre] : []);
+                    const badges = gList.length > 0 
+                        ? gList.map(g => `<span class="text-[7px] sm:text-[8px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-widest inline-block">${g}</span>`).join('')
+                        : `<span class="text-[7px] sm:text-[8px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-widest inline-block">Unbekannt</span>`;
+                    
+                    return `
+                    <tr class="border-b border-slate-700 hover:bg-white/[0.02] transition-colors group">
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 min-w-[200px]">
+                            <div class="text-[11px] sm:text-sm font-black text-white italic tracking-tight mb-1 sm:mb-1.5">${a.title}</div>
+                            <div class="flex flex-wrap gap-1 mb-1 sm:mb-2">${badges}</div>
+                            ${a.comment ? `<div class="text-[9px] sm:text-[10px] text-slate-400 italic line-clamp-2 max-w-[250px] sm:max-w-md">"${a.comment}"</div>` : ''}
+                            <div class="text-[8px] sm:text-[9px] text-slate-600 mt-1.5 sm:mt-2 font-bold uppercase tracking-widest">${a.date}</div>
+                        </td>
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
+                            <span class="text-[10px] sm:text-xs font-black text-slate-300 bg-black/20 px-1.5 sm:px-2 py-1 rounded-md border border-slate-700">${a.score !== undefined ? a.score : '-'}/100</span>
+                        </td>
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-center align-middle">
+                            <span class="text-[10px] sm:text-xs font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border rank-${formatRating(a.rating)}">${a.rating}</span>
+                        </td>
+                        <td class="py-3 sm:py-4 px-2 sm:px-4 text-right align-middle whitespace-nowrap">
+                            <button onclick="window.deleteAnime(${a.id})" class="opacity-0 group-hover:opacity-100 text-red-500/60 hover:text-red-500 hover:bg-red-500/10 p-1.5 sm:p-2 rounded-lg transition-all">🗑️</button>
+                        </td>
+                    </tr>
+                `}).join('');
+            }
+            listBody.innerHTML = html;
+        }
 
         // Setup Anime Form
         function initAnimeReviewer() {
@@ -1186,7 +1409,6 @@
             if(btn && list) btn.disabled = list.children.length >= 5;
         }
 
-        // --- EDIT MATCH LOGIC ---
         window.editMatch = function(id) {
             const match = matches.find(m => m.id === id);
             if (!match) return;
@@ -1672,7 +1894,7 @@
 
         // --- CHANGELOG LOGIC ---
         const changelogs = [
-            // KI: Ab hier neue Versionen eintragen
+            { version: "1.43.00", date: "03.04.2026", changes: ["Hard-Reset der HTML Struktur zur Behebung der Slider-Probleme und unsichtbarer Datenbank-Einträge.", "Fehlende Anime-Skriptlogik wiederhergestellt"] },
             { version: "1.42.00", date: "03.04.2026", changes: ["Ultimate Clean-Up: Alle Duplikate aus der Datei entfernt", "Slider-Rechnung und Auto-Init für Genres repariert", "Unsichtbare Geister-Daten komplett behoben"] },
             { version: "1.41.00", date: "02.04.2026", changes: ["Anime-Tab komplett neu geschrieben: Schnelle Eingabe via Slider (Schieberegler)", "Alle HTML-Duplikate restlos entfernt (behebt unsichtbare Daten und kaputte Buttons)", "Performance-Verbesserung im gesamten Dashboard"] },
             { version: "1.40.00", date: "02.04.2026", changes: ["Kritischer Bugfix: Abgeschnittenen Code im Hintergrund behoben (Syntax Error / Unexpected end of input eliminiert)"] },
@@ -1735,7 +1957,7 @@
     </script>
 
     <div class="fixed bottom-4 right-4 sm:right-6 text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest z-50 bg-[#0f172a]/80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg backdrop-blur-sm border border-white/5 pointer-events-none">
-        v.1.42.00
+        v.1.43.00
     </div>
 </body>
 </html>
